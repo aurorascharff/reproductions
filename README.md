@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# reproductions
 
-## Getting Started
+Public minimal repros for bugs and DX friction — **[github.com/aurorascharff/reproductions](https://github.com/aurorascharff/reproductions)**.
 
-First, run the development server:
+Each case is a standalone Next.js app under `cases/<name>/`. Install and run from that directory.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+**Layout (this repo should look like this on disk and on GitHub):**
+
+```text
+reproductions/
+├── README.md
+├── docs/
+│   └── repro-cookies-opaque-error.png
+├── scripts/
+│   └── publish-to-github.sh
+└── cases/
+    ├── next-cookies-opaque-error/   # Next app (own package.json)
+    ├── 04-04-2026/                  # Next app
+    └── instant-favicon-repro/       # Next app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/reproductions) shows a **single** Next app at the **root** (e.g. `app/` next to `package.json` with **no** `cases/`), you are either looking at an **old push** or `git push` was run from a **different folder**. Fix: `cd ~/Documents/Development/reproductions`, run `ls cases` (you should see three directories), then `git add -A && git status`, commit, and `git push`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cases
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Folder | Description | Source |
+|--------|-------------|--------|
+| [`cases/next-cookies-opaque-error`](./cases/next-cookies-opaque-error) | `cookies()` not awaited → opaque `TypeError` at runtime | Authored for friction log |
+| [`cases/04-04-2026`](./cases/04-04-2026) | App router demo: `/` → `/products/[id]`, `cacheComponents` | Mirrored from **[github.com/aurorascharff/04-04-2026](https://github.com/aurorascharff/04-04-2026)** |
+| [`cases/instant-favicon-repro`](./cases/instant-favicon-repro) | `app/favicon.ico` vs `unstable_instant` + cache components build failure | Mirrored from **[github.com/aurorascharff/instant-favicon-repro](https://github.com/aurorascharff/instant-favicon-repro)** |
 
-## Learn More
+Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 
-To learn more about Next.js, take a look at the following resources:
+## Maintainer: first publish (404 → live repo)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+From this folder, with [`gh` CLI](https://cli.github.com/) logged in (`gh auth login`):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+bash scripts/publish-to-github.sh
+```
 
-## Deploy on Vercel
+That commits any pending changes, runs `gh repo create reproductions --public … --push` if the repo does not exist yet, otherwise pushes to `origin`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Maintainer: later pushes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+cd ~/Documents/Development/reproductions
+git add -A
+git commit -m "your message"
+git push
+```
+
+If you still use standalone repos (**[04-04-2026](https://github.com/aurorascharff/04-04-2026)**, **[instant-favicon-repro](https://github.com/aurorascharff/instant-favicon-repro)**), add a README banner pointing here or archive them to avoid drift.

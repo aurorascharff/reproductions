@@ -1,3 +1,5 @@
+export const unstable_instant = { prefetch: "static" };
+
 import Image from "next/image";
 
 export default function Home() {

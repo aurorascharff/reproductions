@@ -34,20 +34,14 @@ Route (app)        Revalidate  Expire
 
 ## Reproduce
 
-```bash
-pnpm install
-pnpm run build
-pnpm start
-```
+Works correctly with a local prod build (`pnpm build && pnpm start`). The issue only appears when deployed:
 
-1. Open `http://localhost:3000`
+https://partial-fallbacks-repro.vercel.app
+
+1. Open the deployed URL
 2. Click `/items/alpha` (in GSP) — shows loading skeleton, **should be instant**
 3. Go back, click `/items/beta` (not in GSP) — shows loading skeleton (expected on first visit)
 4. Go back, click `/items/beta` again — still shows loading skeleton, **should be instant after auto-upgrade**
-
-### Deployed
-
-https://partial-fallbacks-repro.vercel.app
 
 ## Versions
 

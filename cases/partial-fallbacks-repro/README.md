@@ -1,6 +1,6 @@
 # Partial Fallbacks Repro
 
-> **Production only** — This issue does not appear in `next dev`. You must build and run a production server (or deploy to Vercel) to observe the behavior.
+> **Deployment only** — This issue does not appear in `next dev` or local `next build && next start`. It only reproduces when deployed (e.g. to Vercel).
 
 ## Feature
 
@@ -10,7 +10,7 @@
 
 2. **Automatic upgrade** — After the first visit, the page is cached and upgraded from the generic shell to a fully static version. Subsequent visits should be instant without needing the slug in `generateStaticParams`.
 
-## Expected vs actual behavior
+## Expected vs actual behavior (on Vercel)
 
 | Route | Expected | Actual |
 |---|---|---|

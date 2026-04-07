@@ -52,6 +52,10 @@ pnpm start
 3. Go back, click `/items/beta` (not in GSP) — shows loading skeleton (expected on first visit)
 4. Go back, click `/items/beta` again — still shows loading skeleton, **should be instant after auto-upgrade**
 
+## Deployed
+
+https://partial-fallbacks-repro.vercel.app
+
 ## Versions
 
 - `next@canary` (16.2.1-canary.24)

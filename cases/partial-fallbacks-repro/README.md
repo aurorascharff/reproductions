@@ -18,6 +18,20 @@
 | `/items/beta` (not in GSP, 1st visit) | Fallback shell while content streams in | Shows `loading.tsx` skeleton (same) |
 | `/items/beta` (not in GSP, 2nd visit) | Instant after auto-upgrade | Still shows `loading.tsx` skeleton |
 
+## Build output
+
+```
+Route (app)        Revalidate  Expire
+┌ ○ /
+├ ○ /_not-found
+└ ◐ /items/[slug]         15m      1y
+  ├ /items/[slug]         15m      1y
+  └ /items/alpha          15m      1y
+
+○  (Static)             prerendered as static content
+◐  (Partial Prerender)  prerendered as static HTML with dynamic server-streamed content
+```
+
 ## Reproduce
 
 ```bash

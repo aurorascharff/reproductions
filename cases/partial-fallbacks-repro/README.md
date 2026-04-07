@@ -1,5 +1,7 @@
 # Partial Fallbacks Repro
 
+> **Production only** — This issue does not appear in `next dev`. You must build and run a production server (or deploy to Vercel) to observe the behavior.
+
 ## Feature
 
 `experimental.partialFallbacks` ([Inside Next.js episode](https://nextjs.org/blog/inside-nextjs)) should provide two behaviors for high-cardinality dynamic routes:
@@ -8,36 +10,13 @@
 
 2. **Automatic upgrade** — After the first visit, the page is cached and upgraded from the generic shell to a fully static version. Subsequent visits should be instant without needing the slug in `generateStaticParams`.
 
-## Expected behavior
+## Expected vs actual behavior
 
-- `/items/alpha` (in GSP) — Instant. Pre-rendered at build time, no loading skeleton.
-- `/items/beta` (not in GSP, first visit) — Immediately shows the fallback shell (`loading.tsx`) from CDN while dynamic content streams in.
-- `/items/beta` (not in GSP, second visit) — Instant. Auto-upgraded to fully cached after the first visit.
-
-## Actual behavior
-
-All slugs — including `alpha` (in GSP) — show the `loading.tsx` skeleton on every client-side navigation. No auto-upgrade occurs; non-GSP pages always show the loading skeleton, even on repeat visits.
-
-## Setup
-
-```
-app/
-  page.tsx                  — Home with links to all slugs
-  items/[slug]/
-    page.tsx                — Async page, generateStaticParams returns only ["alpha"]
-    loading.tsx             — Skeleton fallback
-```
-
-`next.config.ts`:
-
-```ts
-const nextConfig = {
-  cacheComponents: true,
-  experimental: {
-    partialFallbacks: true,
-  },
-};
-```
+| Route | Expected | Actual |
+|---|---|---|
+| `/items/alpha` (in GSP) | Instant, pre-rendered at build time | Shows `loading.tsx` skeleton on every navigation |
+| `/items/beta` (not in GSP, 1st visit) | Fallback shell while content streams in | Shows `loading.tsx` skeleton (same) |
+| `/items/beta` (not in GSP, 2nd visit) | Instant after auto-upgrade | Still shows `loading.tsx` skeleton |
 
 ## Reproduce
 
@@ -52,7 +31,7 @@ pnpm start
 3. Go back, click `/items/beta` (not in GSP) — shows loading skeleton (expected on first visit)
 4. Go back, click `/items/beta` again — still shows loading skeleton, **should be instant after auto-upgrade**
 
-## Deployed
+### Deployed
 
 https://partial-fallbacks-repro.vercel.app
 

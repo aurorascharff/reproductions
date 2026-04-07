@@ -7,6 +7,7 @@ export default async function ItemPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  "use cache";
   const { slug } = await params;
   await new Promise((resolve) => setTimeout(resolve, 2000));
 

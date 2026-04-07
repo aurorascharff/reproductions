@@ -22,6 +22,10 @@ const products: Record<string, Product> = {
   },
 };
 
+export async function generateStaticParams() {
+  return Object.keys(products).map((id) => ({ id }));
+}
+
 function getProduct(id: string): Product | null {
   return products[id] ?? null;
 }
@@ -43,6 +47,9 @@ export default async function ProductPage({
       <h1 className="text-2xl font-semibold">{product.title}</h1>
       <p className="text-lg font-medium">${product.price.toFixed(2)}</p>
       <p className="text-zinc-600">{product.description}</p>
+      <p className="text-xs text-zinc-400">
+        Prerendered at {new Date().toISOString()}
+      </p>
     </main>
   );
 }

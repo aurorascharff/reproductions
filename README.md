@@ -28,6 +28,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/next-cookies-opaque-error`](./cases/next-cookies-opaque-error) | `cookies()` not awaited → opaque `TypeError` at runtime | Authored for friction log |
 | [`cases/04-04-2026`](./cases/04-04-2026) | App router demo: `/` → `/products/[id]`, `cacheComponents` | Mirrored from **[github.com/aurorascharff/04-04-2026](https://github.com/aurorascharff/04-04-2026)** |
 | [`cases/instant-favicon-repro`](./cases/instant-favicon-repro) | `app/favicon.ico` vs `unstable_instant` + cache components build failure | Mirrored from **[github.com/aurorascharff/instant-favicon-repro](https://github.com/aurorascharff/instant-favicon-repro)** |
+| [`cases/empty-generate-static-params`](./cases/empty-generate-static-params) | `cacheComponents: true` + `generateStaticParams` returning `[]` → 500 + blank screen at request time | Authored for friction log |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

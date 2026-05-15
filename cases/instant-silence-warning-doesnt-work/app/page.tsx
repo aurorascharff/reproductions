@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-export const unstable_instant = false;
-
 export default function Home() {
   return (
     <main style={{ fontFamily: "system-ui", padding: 32 }}>

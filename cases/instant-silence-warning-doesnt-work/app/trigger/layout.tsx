@@ -13,7 +13,6 @@
 // instant validation in the first place — moving `instant = false` onto
 // `trigger/page.tsx` (or removing `unstable_instant` from there) is what
 // actually silences the warning. The fix card overpromises.
-export const unstable_instant = false;
 
 export default function TriggerLayout({
   // children intentionally not rendered to fire the unrendered-segment

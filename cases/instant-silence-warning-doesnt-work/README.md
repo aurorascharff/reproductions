@@ -1,6 +1,6 @@
 # instant-silence-warning-doesnt-work
 
-Minimal repro for the "unrendered segment" instant validation warning where the **dev overlay's "Silence this warning" fix card lies**: setting `export const unstable_instant = false` on the parent layout does not actually silence the warning.
+Minimal repro for the "unrendered segment" instant validation warning. The dev overlay's "Allow no validation" fix card was previously ambiguous about **where** `instant = false` has to go.
 
 ## Setup
 
@@ -20,30 +20,19 @@ Unrendered segment:
   app/trigger/page.tsx
 ```
 
-The overlay's second fix card says:
+`app/trigger/layout.tsx` drops `{children}` so the page never renders during instant validation.
 
-> **Silence this warning**
-> ```
-> // page.tsx or layout.tsx
-> export const instant = false
-> ```
+## What actually silences it
 
-That advice is already applied to `app/trigger/layout.tsx` in this repro — and the warning still fires.
+Set `export const instant = false` on the **unrendered segment file itself** (the one named in the error — `app/trigger/page.tsx` here), not on the parent layout that fails to render it. Putting the opt-out on `trigger/layout.tsx` is unreachable because the loader-tree walk in `isPageAllowedToBlock()` (see `packages/next/src/server/app-render/instant-validation/instant-config.tsx`) hits the page-level config first when the page itself declared `unstable_instant = true`.
 
-## Why
+Per Josh Story (vercel/next.js#93770 thread, May 16):
 
-`isPageAllowedToBlock()` in `packages/next/src/server/app-render/instant-validation/instant-config.tsx` walks the loader tree top-down. The first non-undefined `unstable_instant` config it finds wins:
-
-- `unstable_instant = true` on `trigger/page.tsx` → page is *not* allowed to block → instant validation runs → unrendered-segment warning fires
-- `unstable_instant = false` on `trigger/layout.tsx` → unreachable: the walk hits the page-level config first
-
-The fix card implies the opt-out at the layout level will silence the warning. In practice the opt-out has to live on the segment whose `unstable_instant = true` requested validation, or above any segment that opted in. Putting `instant = false` on a sibling/parent that the validating segment doesn't depend on does nothing.
-
-## Real-world impact
-
-Per Josh's framing (vercel-site sidebar example): the segment may be conditionally rendered or opt out of SSR, and the user has no good way to express "this is intentional, don't validate". The overlay says "silence this warning" but the recipe doesn't work for the common case.
+> *"so in this case the page is saying 'i must be instant' and the false on the layout is irrelevant. if something higher up than `trigger/layout.tsx` didn't render children then this false should suppress the warning. … so if you move the false to the page it should go away."*
 
 ## Action items
 
-- 🔧 Either make the fix card's recipe actually work (have `instant = false` on the parent layout cascade to suppress validation of its rendered/non-rendered children), or
-- 🔧 Rewrite the fix card copy to be honest — the only way to silence is to remove `unstable_instant = true` from the child page (or set it to `false` on the *page*, which contradicts the user's original intent of wanting instant for that route).
+- Fix-card copy on `aurorascharff/redesign-unrendered-segment-overlay` updated:
+  - Snippet now reads `// unrendered segment` rather than `// page.tsx or layout.tsx`.
+  - Build-message bullet now reads `Set \`export const instant = false\` on the unrendered segment to allow no validation and silence this warning`.
+- Docs: explain that `instant = false` on a parent layout silences validation for descendants only when no descendant explicitly opted in via `unstable_instant = true`. The truthy config on a descendant wins.

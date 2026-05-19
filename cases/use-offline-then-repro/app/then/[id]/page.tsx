@@ -1,5 +1,11 @@
 import { Suspense } from 'react';
 import { SlowContent } from '../../slow-content';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  return { title: `Then — ${id}` };
+}
 
 export default function ThenPage({ params }: { params: Promise<{ id: string }> }) {
   return (

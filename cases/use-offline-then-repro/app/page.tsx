@@ -5,7 +5,12 @@ export default function HomePage() {
   return (
     <div>
       <h1 style={{ marginBottom: 8 }}>Offline navigation repro</h1>
-      <p style={{ marginBottom: 24, color: '#888' }}>Go offline, then click a link below the fold.</p>
+      <ol style={{ marginBottom: 24, color: '#888', lineHeight: 2 }}>
+        <li>Wait for all visible links to prefetch (watch Network tab — requests stop)</li>
+        <li>Go offline in DevTools → Network → Offline</li>
+        <li>Scroll down to links that were NOT visible (not prefetched)</li>
+        <li>Click one from each column at the same row and compare</li>
+      </ol>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
         <div>
           <h2 style={{ marginBottom: 12 }}>Async wrapper</h2>

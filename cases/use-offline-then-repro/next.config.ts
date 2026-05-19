@@ -4,8 +4,10 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   experimental: {
     cachedNavigations: true,
+    optimisticRouting: true,
     prefetchInlining: true,
     useOffline: true,
+    varyParams: true,
   },
 };
 

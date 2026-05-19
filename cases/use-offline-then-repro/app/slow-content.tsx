@@ -3,6 +3,7 @@ async function delay(ms: number) {
 }
 
 export async function SlowContent({ id }: { id: string }) {
+  'use cache';
   await delay(1000);
   return (
     <div style={{ padding: 16, border: '1px solid #444', borderRadius: 8, marginTop: 12 }}>

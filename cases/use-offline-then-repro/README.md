@@ -27,11 +27,10 @@ Both patterns should show the `loading.tsx` shell when navigating offline.
 
 Only `await params` pages show the shell. `params.then()` pages fail to navigate offline.
 
-## Key files
+## Key difference
 
-- [`app/async/[id]/page.tsx`](./app/async/[id]/page.tsx) — uses `await params` ✅
-- [`app/then/[id]/page.tsx`](./app/then/[id]/page.tsx) — uses `params.then()` ❌
-- Both have identical `loading.tsx` files
+- `app/async/[id]/` has `loading.tsx` → route-level Suspense boundary
+- `app/then/[id]/` has NO `loading.tsx`, only inline `<Suspense>` around `params.then()` → should still work as the offline shell but doesn't
 
 ## Environment
 

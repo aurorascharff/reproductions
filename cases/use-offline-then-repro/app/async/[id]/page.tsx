@@ -7,6 +7,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: `Async — ${id}` };
 }
 
+export const unstable_prefetch = 'force-runtime';
+
 export default function AsyncPage({ params }: { params: Promise<{ id: string }> }) {
   return (
     <div>

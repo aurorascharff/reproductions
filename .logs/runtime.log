@@ -1,0 +1,1 @@
+[2026-05-20T08:42:15.658Z] [WARN] [UnifiedLog] Subscriber not created — events.jsonl will NOT be written. Check vercel.ai.logging.fileDirectory setting and workspace folders.

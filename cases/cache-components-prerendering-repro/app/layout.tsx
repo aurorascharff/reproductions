@@ -6,10 +6,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ fontFamily: 'system-ui', padding: 20 }}>
         <nav style={{ display: 'flex', gap: 16, marginBottom: 20, borderBottom: '1px solid #333', paddingBottom: 12 }}>
           <Link href="/">Home</Link>
-          <Link href="/uncached/1">Uncached</Link>
-          <Link href="/cached/1">Cached</Link>
-          <Link href="/cached-fn/1">Cached fn</Link>
-          <Link href="/cached-private/1">Cached private</Link>
+          <Link href="/uncached/1">Uncached /1</Link>
+          <Link href="/uncached/2">Uncached /2</Link>
+          <Link href="/cached-private/1">Private /1</Link>
+          <Link href="/cached-private/2">Private /2</Link>
         </nav>
         {children}
       </body>

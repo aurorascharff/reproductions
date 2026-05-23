@@ -1,8 +1,8 @@
 export default function Page() {
   return (
     <div>
-      <h1>Home</h1>
-      <p>Static page. Look at the sidebar.</p>
+      <h1>About</h1>
+      <p>Also static. Sidebar is shared.</p>
     </div>
   );
 }

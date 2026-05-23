@@ -1,6 +1,6 @@
-# `usePathname()` inside Suspense never resolves on a fully static route
+# `usePathname()` inside `<Suspense>` never resolves on a fully static route
 
-With `cacheComponents: true`, a `<Suspense>` boundary around a Client Component that calls `usePathname()` gets stuck on the fallback after hard reload — but only on **fully static routes**. On dynamic routes it works as expected.
+With `cacheComponents: true`, wrapping a Client Component that calls `usePathname()` in `<Suspense>` is the documented pattern to keep the parent prerenderable. On dynamic routes this works. On a **fully static** route (no `await connection()`, `cookies()`, etc.) the Suspense boundary stays on its fallback forever — even though `usePathname()` returns a real value synchronously in the client bundle.
 
 ## Setup
 
@@ -11,23 +11,29 @@ pnpm dev
 
 ## Steps
 
+### Static route (broken)
+
 1. Visit `http://localhost:3000/` (fully static — no dynamic APIs).
 2. Hard reload.
-   - **Expected:** green "RESOLVED pathname: /" appears after hydration.
-   - **Actual:** red "FALLBACK" text stays visible forever. The Suspense never resolves on the client.
-3. Click "Go to dynamic route →".
-4. Hard reload.
-   - You see green "RESOLVED pathname: /dynamic" — works as expected because the route is dynamic via `await connection()`.
+3. The page shows **red FALLBACK** text forever. The Suspense boundary's children never render on the client.
+4. View source: the HTML contains the suspended placeholder (`<!--$?-->` ... `<template id="B:0"></template>`) but no resolution chunk ever arrives.
 
-## Why it's a problem
+### Dynamic route (works)
 
-The `usePathname()` docs treat it as a normal client hook. When cache components is on, it suspends during prerender (since the path isn't known at build time) — which is fine, that's what the Suspense boundary is for. The issue is that the **suspended boundary's content never gets streamed/resolved for a fully static route**, so the prerendered HTML ships with a permanently-pending Suspense placeholder. The client has the router context available immediately on hydration, but the fallback never gets replaced.
+1. Click "Go to dynamic route →".
+2. Hard reload `/dynamic`.
+3. The page shows **green RESOLVED pathname: /dynamic** correctly after hydration.
+4. The only difference between this route and `/` is `await connection()` somewhere on the page — which makes the route dynamic and apparently activates the Suspense streaming machinery.
 
-This breaks a very common pattern: any client-side use of `usePathname()` (active nav links, breadcrumbs, conditional UI) that the docs encourage wrapping in Suspense to keep the parent prerenderable.
+## What should happen
+
+`usePathname()` is a client-only hook. Once React hydrates on the client, the router context is available synchronously. The Suspense boundary's children should render immediately on hydration, replacing the fallback — same as the dynamic route does.
+
+Instead, on fully static routes, the suspended placeholder is shipped in the prerendered HTML with no client-side resolution path. The fallback persists indefinitely.
 
 ## Workaround
 
-Use a `mounted` state flag instead of Suspense:
+Skip the documented Suspense pattern and use a `mounted` state flag instead:
 
 ```tsx
 'use client';
@@ -41,10 +47,10 @@ export function NavLink({ href }) {
 }
 ```
 
-This forces SSR/prerender to render with `isActive: false`, hydration matches the server, then `useEffect` flips `mounted: true` and the active state appears one render later. But this defeats the purpose of `usePathname()` returning a real value synchronously on the client.
+SSR/prerender produces `isActive: false`. Hydration matches. `useEffect` fires post-mount → `setMounted(true)` → re-render with the resolved pathname. Works on every route (static or dynamic) at the cost of one extra render after hydration.
 
 ## Affected versions
 
 - `next@16.3.0-canary.27`
-- React `19.2.4`
-- Cache Components enabled
+- `react@19.2.4`
+- `cacheComponents: true`

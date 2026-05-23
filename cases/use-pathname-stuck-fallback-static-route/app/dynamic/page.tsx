@@ -3,26 +3,38 @@ import { Suspense } from 'react';
 import { connection } from 'next/server';
 import { PathnameDisplay } from '../pathname-display';
 
-// Same shape as `/`, but the page also reads `connection()` so the route is
-// dynamic. The Suspense streaming machinery is active and the inner content
-// arrives — fallback IS replaced after hydration.
-async function Dynamic() {
+// `await connection()` makes the route dynamic.
+async function ForceDynamic() {
   await connection();
-  return <p style={{ color: 'gray' }}>(this route is dynamic via connection())</p>;
+  return null;
 }
 
 export default function Page() {
   return (
     <main>
-      <h1>Dynamic page</h1>
-      <Suspense fallback={<p style={{ color: 'red', fontWeight: 'bold' }}>FALLBACK (should disappear after hydration)</p>}>
-        <PathnameDisplay />
-      </Suspense>
+      <h1>Dynamic route (works)</h1>
+      <p>
+        Same shape as the static route, but with <code>await connection()</code> in a sibling component to opt the route
+        out of static prerendering.
+      </p>
+      <p>
+        <strong>After hard reload:</strong> green resolved pathname appears, as expected.
+      </p>
+
+      <div style={{ marginTop: '2rem', padding: '1rem', border: '2px solid #ccc', borderRadius: '8px' }}>
+        <Suspense
+          fallback={<p style={{ color: 'red', fontWeight: 'bold', margin: 0 }}>❌ FALLBACK (should disappear after hydration)</p>}
+        >
+          <PathnameDisplay />
+        </Suspense>
+      </div>
+
       <Suspense fallback={null}>
-        <Dynamic />
+        <ForceDynamic />
       </Suspense>
+
       <nav style={{ marginTop: '2rem' }}>
-        <Link href="/">← Back to static route</Link>
+        <Link href="/">← Back to static route (broken)</Link>
       </nav>
     </main>
   );

@@ -1,56 +1,32 @@
-# `usePathname()` inside `<Suspense>` never resolves on a fully static route
+# `usePathname()` returns the rewritten internal path, not the user-facing URL
 
-With `cacheComponents: true`, wrapping a Client Component that calls `usePathname()` in `<Suspense>` is the documented pattern to keep the parent prerenderable. On dynamic routes this works. On a **fully static** route (no `await connection()`, `cookies()`, etc.) the Suspense boundary stays on its fallback forever — even though `usePathname()` returns a real value synchronously in the client bundle.
+When middleware/proxy rewrites a request internally (e.g. `/` → `/noprefetch/`), `usePathname()` on the client returns the **rewritten internal path**, not the URL the user sees in the address bar.
+
+This breaks active-link styling: a `NavLink` with `href="/"` compares its `href` to `usePathname()` and gets `false` because `usePathname()` returns `/noprefetch/` instead of `/`.
 
 ## Setup
 
 ```bash
 pnpm install
-pnpm dev
+pnpm build
+pnpm start
 ```
 
 ## Steps
 
-### Static route (broken)
+1. Visit `http://localhost:3000/` — `Home` in the sidebar shows `✅ ACTIVE`. Correct.
+2. In devtools, set a cookie `no-prefetch=1` for `localhost`.
+3. Hard reload `/`.
+4. `Home` now shows `(inner, inactive)` — even though the URL bar still says `/`.
 
-1. Visit `http://localhost:3000/` (fully static — no dynamic APIs).
-2. Hard reload.
-3. The page shows **red FALLBACK** text forever. The Suspense boundary's children never render on the client.
-4. View source: the HTML contains the suspended placeholder (`<!--$?-->` ... `<template id="B:0"></template>`) but no resolution chunk ever arrives.
-
-### Dynamic route (works)
-
-1. Click "Go to dynamic route →".
-2. Hard reload `/dynamic`.
-3. The page shows **green RESOLVED pathname: /dynamic** correctly after hydration.
-4. The only difference between this route and `/` is `await connection()` somewhere on the page — which makes the route dynamic and apparently activates the Suspense streaming machinery.
+The proxy at `proxy.ts` rewrites `/` to `/noprefetch/` internally when the cookie is set. `usePathname()` returns the rewritten value.
 
 ## What should happen
 
-`usePathname()` is a client-only hook. Once React hydrates on the client, the router context is available synchronously. The Suspense boundary's children should render immediately on hydration, replacing the fallback — same as the dynamic route does.
-
-Instead, on fully static routes, the suspended placeholder is shipped in the prerendered HTML with no client-side resolution path. The fallback persists indefinitely.
-
-## Workaround
-
-Skip the documented Suspense pattern and use a `mounted` state flag instead:
-
-```tsx
-'use client';
-
-export function NavLink({ href }) {
-  const [mounted, setMounted] = useState(false);
-  const pathname = usePathname();
-  useEffect(() => setMounted(true), []);
-  const isActive = mounted ? pathname === href : false;
-  // ...
-}
-```
-
-SSR/prerender produces `isActive: false`. Hydration matches. `useEffect` fires post-mount → `setMounted(true)` → re-render with the resolved pathname. Works on every route (static or dynamic) at the cost of one extra render after hydration.
+`usePathname()` should return the **user-facing URL** (`/`), not the internal rewrite target (`/noprefetch/`). The user's address bar says `/`, the link's `href="/"` matches that intent — but `usePathname()` doesn't.
 
 ## Affected versions
 
-- `next@16.3.0-canary.27`
+- `next@16.3.0-canary.24`
 - `react@19.2.4`
 - `cacheComponents: true`

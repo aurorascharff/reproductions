@@ -1,28 +1,29 @@
 import { Suspense } from "react";
 import { getData } from "../../data";
 
-export default function UncachedPage({
+export default function CachedDefaultPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   return (
     <div>
-      <h2>Uncached page</h2>
+      <h2>use cache (default)</h2>
       <p style={{ color: "#888" }}>
-        No <code>'use cache'</code> — baseline. Revisits should be instant after
-        first compile.
+        <code>&apos;use cache&apos;</code> on the component. Blocks first time,
+        no skeleton.
       </p>
-      <Suspense fallback={<p>⏳ Loading (uncached)...</p>}>
+      <Suspense fallback={<p>⏳ Loading (default cache)...</p>}>
         {params.then(({ id }) => (
-          <Content id={id} />
+          <CachedContent id={id} />
         ))}
       </Suspense>
     </div>
   );
 }
 
-async function Content({ id }: { id: string }) {
+async function CachedContent({ id }: { id: string }) {
+  "use cache";
   const data = await getData(id);
   return (
     <div

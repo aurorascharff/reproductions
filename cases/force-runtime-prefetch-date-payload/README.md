@@ -1,6 +1,6 @@
 # force-runtime-prefetch-date-payload
 
-Minimal repro for noisy/aborted RSC streams with `cacheComponents`, `cachedNavigations`, `unstable_prefetch = 'force-runtime'`, and a cached payload that includes a `Date`.
+Minimal repro for a production app failure with `cacheComponents`, `cachedNavigations`, `unstable_prefetch = 'force-runtime'`, and a cached payload that includes a `Date`.
 
 ## Setup
 
@@ -19,7 +19,7 @@ The first grid uses `app/[handle]/page.tsx`, which exports:
 export const unstable_prefetch = 'force-runtime';
 ```
 
-That route renders a cached payload including a real `Date` object passed to a Client Component. In the affected app, production logs showed repeated `Error: Connection closed` entries for profile routes while the request still returned `200`.
+That route renders a cached payload including a real `Date` object passed to a Client Component. In the affected app, production failed when opening that dynamic route, with repeated `Error: Connection closed` entries in the logs.
 
 Removing the `unstable_prefetch` export from `app/[handle]/page.tsx` stopped the issue in the app.
 
@@ -38,4 +38,4 @@ The profile payload includes React's Date serialization marker:
 "generatedAt":"$D2026-..."
 ```
 
-Local `next start` may not always print the same `Connection closed` log as Vercel. The original failure was observed in deployed production logs, and removing the `unstable_prefetch` export from the dynamic profile route stopped the noisy profile stream errors there.
+Local `next start` may not always reproduce the same failure as Vercel. The original issue was observed as a deployed production app failure when opening the dynamic route, and removing the `unstable_prefetch` export from that route stopped the failures there.

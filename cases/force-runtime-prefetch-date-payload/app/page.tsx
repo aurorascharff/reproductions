@@ -32,6 +32,16 @@ export default function HomePage() {
           </Link>
         ))}
       </div>
+
+      <h2>String payload route</h2>
+      <div className="grid">
+        {HANDLES.map(handle => (
+          <Link className="card" href={`/string/${handle}`} key={handle}>
+            <strong>@{handle}</strong>
+            <p className="muted">force-runtime prefetch route, cached ISO string payload</p>
+          </Link>
+        ))}
+      </div>
     </main>
   );
 }

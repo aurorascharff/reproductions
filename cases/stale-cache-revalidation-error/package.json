@@ -1,5 +1,5 @@
 {
-  "name": "force-runtime-prefetch-date-payload",
+  "name": "stale-cache-revalidation-error",
   "version": "0.1.0",
   "private": true,
   "scripts": {

@@ -3,7 +3,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 type EscapedProfile = {
   attempt: number;
   handle: string;
-  status: 'armed' | 'success';
+  status: 'success';
 };
 
 class EscapedRevalidationError extends Error {
@@ -38,15 +38,7 @@ export async function getEscapedProfile(handle: string): Promise<EscapedProfile>
 
   if (shouldEscape.has(lower)) {
     shouldEscape.delete(lower);
-    setTimeout(() => {
-      throw new EscapedRevalidationError();
-    }, 0);
-
-    return {
-      attempt,
-      handle: lower,
-      status: 'armed',
-    };
+    throw new EscapedRevalidationError();
   }
 
   return {

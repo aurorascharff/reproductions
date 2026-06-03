@@ -1,6 +1,6 @@
 'use client';
 
-import { armEscapedProfileFailure, resetEscapedProfileAction, warmEscapedProfile } from './actions';
+import { armEscapedProfileFailure, resetEscapedProfileAction, throwNormalProfileError, warmEscapedProfile } from './actions';
 
 type EscapedControlsProps = {
   handle: string;
@@ -10,9 +10,9 @@ export function EscapedControls({ handle }: EscapedControlsProps) {
   return (
     <div className="panel">
       <ol>
-        <li>Reset</li>
-        <li>Warm success</li>
-        <li>Arm failure, wait one second, refresh</li>
+        <li>Normal throw should render the route error boundary.</li>
+        <li>Warm success, arm escaped failure, wait one second, refresh.</li>
+        <li>The escaped failure should break the request instead of showing that boundary.</li>
       </ol>
       <div className="actions">
         <form action={resetEscapedProfileAction}>
@@ -23,9 +23,13 @@ export function EscapedControls({ handle }: EscapedControlsProps) {
           <input name="handle" type="hidden" value={handle} />
           <button type="submit">Warm success</button>
         </form>
+        <form action={throwNormalProfileError}>
+          <input name="handle" type="hidden" value={handle} />
+          <button type="submit">Normal throw</button>
+        </form>
         <form action={armEscapedProfileFailure}>
           <input name="handle" type="hidden" value={handle} />
-          <button type="submit">Arm failure</button>
+          <button type="submit">Arm escaped failure</button>
         </form>
       </div>
     </div>

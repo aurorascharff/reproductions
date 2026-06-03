@@ -17,15 +17,19 @@ pnpm start
 
 Open <http://localhost:3000/escaped-revalidation/icyJoseph>.
 
+Control: click **Normal throw**. It should render the route `error.tsx`.
+
+Repro:
+
 1. Click **Reset**.
 2. Click **Warm success**.
-3. Click **Arm failure**.
+3. Click **Arm escaped failure**.
 4. Wait at least one second so the cached entry is stale.
 5. Refresh the page in `next start` or production.
 
 Expected: the route error boundary catches the failure, or the stale cached value remains visible.
 
-Actual: the failure can escape the route boundary and show up as a failed request, process-level error, or interrupted stream.
+Actual: the stale revalidation failure can escape the route boundary and show up as a failed request, process-level error, or interrupted stream.
 
 ## Production Symptom
 

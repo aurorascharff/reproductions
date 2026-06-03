@@ -13,6 +13,10 @@ function redirectToEscapedRoute(handle: string): never {
   redirect(`/escaped-revalidation/${handle}` as Route);
 }
 
+function redirectToNormalError(handle: string): never {
+  redirect(`/escaped-revalidation/${handle}?normal-error=1` as Route);
+}
+
 function updateEscapedProfileTag(handle: string) {
   updateTag(`escaped-profile-${handle}`);
 }
@@ -33,6 +37,13 @@ export async function armEscapedProfileFailure(formData: FormData) {
 
   armEscapedRevalidation(handle);
   redirectToEscapedRoute(handle);
+}
+
+export async function throwNormalProfileError(formData: FormData) {
+  const handle = readHandle(formData);
+  if (!handle) return;
+
+  redirectToNormalError(handle);
 }
 
 export async function resetEscapedProfileAction(formData: FormData) {

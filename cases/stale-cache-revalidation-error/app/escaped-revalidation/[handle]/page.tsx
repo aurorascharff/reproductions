@@ -7,28 +7,34 @@ export const unstable_prefetch = 'force-runtime';
 
 type PageProps = {
   params: Promise<{ handle: string }>;
+  searchParams: Promise<{ 'normal-error'?: string }>;
 };
 
-export default function EscapedRevalidationPage({ params }: PageProps) {
+export default function EscapedRevalidationPage({ params, searchParams }: PageProps) {
   return (
     <main className="page">
       <Link href="/">Back</Link>
       <Suspense fallback={<div className="panel muted">Loading repro...</div>}>
-        <EscapedRevalidationRepro params={params} />
+        <EscapedRevalidationRepro params={params} searchParams={searchParams} />
       </Suspense>
     </main>
   );
 }
 
-async function EscapedRevalidationRepro({ params }: PageProps) {
+async function EscapedRevalidationRepro({ params, searchParams }: PageProps) {
   const { handle } = await params;
+  const query = await searchParams;
+
+  if (query['normal-error'] === '1') {
+    throw new Error('Normal render error caught by the route error boundary.');
+  }
 
   return (
     <>
       <h1>Escaped cached failure</h1>
       <p className="muted">
-        Warm a cached value, arm a deterministic async failure, wait one second, then refresh. Expected: the route error
-        boundary catches it or the stale value remains. Actual: the response can fail before the boundary contains it.
+        Normal throw should render error.tsx. Escaped failure should happen during stale cache revalidation and break the
+        request before the route boundary can contain it.
       </p>
       <EscapedControls handle={handle} />
 

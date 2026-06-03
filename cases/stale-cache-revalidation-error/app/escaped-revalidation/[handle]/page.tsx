@@ -33,8 +33,8 @@ async function EscapedRevalidationRepro({ params, searchParams }: PageProps) {
     <>
       <h1>Escaped cached failure</h1>
       <p className="muted">
-        Normal throw should render error.tsx. Escaped failure should happen during stale cache revalidation and break the
-        request before the route boundary can contain it.
+        The normal throw renders <span className="mono">error.tsx</span>. The cached revalidation throw escapes to the
+        server log instead.
       </p>
       <EscapedControls handle={handle} />
 

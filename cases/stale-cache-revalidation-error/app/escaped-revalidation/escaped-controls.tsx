@@ -10,9 +10,9 @@ export function EscapedControls({ handle }: EscapedControlsProps) {
   return (
     <div className="panel">
       <ol>
-        <li>Normal throw should render the route error boundary.</li>
-        <li>Warm success, arm escaped failure, wait one second, refresh.</li>
-        <li>The escaped failure should break the request instead of showing that boundary.</li>
+        <li>Click Normal throw. It should render the route error boundary.</li>
+        <li>Go back, then Reset, Warm success, Arm escaped failure.</li>
+        <li>Wait one second and refresh. The failure should appear in the server log, not this boundary.</li>
       </ol>
       <div className="actions">
         <form action={resetEscapedProfileAction}>

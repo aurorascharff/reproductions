@@ -17,7 +17,7 @@ pnpm start
 
 Open <http://localhost:3000/escaped-revalidation/icyJoseph>.
 
-Control: click **Normal throw**. It should render the route `error.tsx`.
+Control: click **Normal throw**. It should render the route `error.tsx` in the browser.
 
 Repro:
 
@@ -27,9 +27,15 @@ Repro:
 4. Wait at least one second so the cached entry is stale.
 5. Refresh the page in `next start` or production.
 
-Expected: the route error boundary catches the failure, or the stale cached value remains visible.
+Expected: the route error boundary catches the failure, or the stale cached value remains visible without a server error.
 
-Actual: the stale revalidation failure can escape the route boundary and show up as a failed request, process-level error, or interrupted stream.
+Actual: the stale revalidation failure escapes the route boundary. In `next start`, the browser may keep showing the stale cached value while the terminal logs:
+
+```text
+Error: Deterministic async failure escaped the route error boundary.
+```
+
+In production this can show up as a failed request, process-level error, or interrupted stream.
 
 ## Production Symptom
 

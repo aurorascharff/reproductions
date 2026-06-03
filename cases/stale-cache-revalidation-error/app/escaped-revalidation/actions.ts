@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidateTag, updateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Route } from 'next';
 import { armEscapedRevalidation, getEscapedProfile, resetEscapedRevalidation } from './escaped-profile';
@@ -36,6 +36,7 @@ export async function armEscapedProfileFailure(formData: FormData) {
   if (!handle) return;
 
   armEscapedRevalidation(handle);
+  revalidateTag(`escaped-profile-${handle}`, 'max');
   redirectToEscapedRoute(handle);
 }
 

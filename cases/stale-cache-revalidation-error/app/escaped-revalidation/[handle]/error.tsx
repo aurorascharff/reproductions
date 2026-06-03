@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
+import { usePathname, useRouter } from 'next/navigation';
 
 type ErrorProps = {
   error: Error & { digest?: string };
@@ -8,6 +10,9 @@ type ErrorProps = {
 };
 
 export default function EscapedRevalidationError({ error, reset }: ErrorProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+
   return (
     <main className="page">
       <Link href="/">Back</Link>
@@ -21,7 +26,13 @@ export default function EscapedRevalidationError({ error, reset }: ErrorProps) {
           </p>
         ) : null}
         <div className="actions">
-          <button type="button" onClick={reset}>
+          <button
+            type="button"
+            onClick={() => {
+              router.replace(pathname as Route);
+              reset();
+            }}
+          >
             Reset boundary
           </button>
         </div>

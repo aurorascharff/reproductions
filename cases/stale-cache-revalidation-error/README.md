@@ -37,6 +37,18 @@ Error: Deterministic async failure escaped the route error boundary.
 
 In production this can show up as a failed request, process-level error, or interrupted stream.
 
+## Error Boundary Current Time
+
+Open <http://localhost:3000/error-current-time/icyJoseph>.
+
+1. Run `pnpm build`.
+2. Notice the build passes because `error.tsx` is not rendered during build.
+3. Open the failing route from the page.
+
+Expected: either the build catches the unsafe `Date.now()` in `error.tsx`, or the runtime boundary renders normally.
+
+Actual: the unsafe current-time read is only discovered when the error boundary renders.
+
 ## Production Symptom
 
 In the affected app, errors escaping cached work showed up as:

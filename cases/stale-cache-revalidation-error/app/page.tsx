@@ -9,6 +9,9 @@ export default function HomePage() {
       <p>
         <Link href={'/escaped-revalidation/icyJoseph' as Route}>Open the repro</Link>
       </p>
+      <p>
+        <Link href={'/error-current-time/icyJoseph' as Route}>Open the error.tsx current time repro</Link>
+      </p>
     </main>
   );
 }

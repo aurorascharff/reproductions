@@ -53,6 +53,19 @@ a {
   background: #111216;
 }
 
+.steps h2 {
+  margin-top: 0;
+}
+
+.steps ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.steps li + li {
+  margin-top: 8px;
+}
+
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }

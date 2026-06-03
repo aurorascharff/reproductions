@@ -28,8 +28,8 @@ async function StaleRevalidationRepro({ params }: PageProps) {
     <>
       <h1>@{handle}</h1>
       <p className="muted">
-        Warm the cache, mark the backing source as rate-limited, wait at least one second, then refresh this route. The
-        cached value should stay visible while the stale revalidation failure is handled.
+        This route warms a cached success, then makes the backing source throw a deterministic error once the entry is
+        stale. The cached value should stay visible while the stale revalidation failure is handled.
       </p>
       <ReproControls handle={handle} redirectTo={`/stale-revalidate/${handle}`} />
 

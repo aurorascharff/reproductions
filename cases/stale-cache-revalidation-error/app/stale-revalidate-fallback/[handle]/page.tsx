@@ -28,7 +28,7 @@ async function FallbackRevalidationRepro({ params }: PageProps) {
     <>
       <h1>@{handle}</h1>
       <p className="muted">
-        Same stale setup, but the cached function catches the rate-limit-shaped failure and returns fallback data.
+        Same stale setup, but the cached function catches the deterministic upstream failure and returns fallback data.
         Refresh after the entry becomes stale to see whether the fallback replaces the previous success.
       </p>
       <ReproControls handle={handle} redirectTo={`/stale-revalidate-fallback/${handle}`} />

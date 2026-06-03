@@ -10,7 +10,7 @@ export default function HomePage() {
       <h1>stale cache revalidation error</h1>
       <p className="muted">
         The stale revalidation routes warm a cached success, then make the backing source throw a
-        GitHub-rate-limit-shaped error after the value becomes stale.
+        deterministic upstream error after the value becomes stale.
       </p>
 
       <h2>Primary stale revalidation repro</h2>
@@ -18,7 +18,7 @@ export default function HomePage() {
         {HANDLES.map(handle => (
           <Link className="card" href={`/stale-revalidate/${handle}`} key={handle}>
             <strong>@{handle}</strong>
-            <p className="muted">force-runtime prefetch, cached success, then stale revalidation throws 403</p>
+            <p className="muted">force-runtime prefetch, cached success, then stale revalidation throws</p>
           </Link>
         ))}
       </div>
@@ -38,7 +38,7 @@ export default function HomePage() {
         {HANDLES.map(handle => (
           <Link className="card" href={`/stale-revalidate-fallback/${handle}` as Route} key={handle}>
             <strong>@{handle}</strong>
-            <p className="muted">same stale path, but a caught 403 returns fallback data from use cache</p>
+            <p className="muted">same stale path, but a caught error returns fallback data from use cache</p>
           </Link>
         ))}
       </div>
@@ -98,7 +98,7 @@ export default function HomePage() {
         {HANDLES.map(handle => (
           <Link className="card" href={`/flaky/${handle}`} key={handle}>
             <strong>@{handle}</strong>
-            <p className="muted">first cached profile render throws 403, regenerate warms same tag</p>
+            <p className="muted">first cached profile render throws, regenerate warms same tag</p>
           </Link>
         ))}
       </div>

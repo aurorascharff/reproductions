@@ -6,11 +6,11 @@ type FlakyProfile = {
   attempt: number;
 };
 
-class GitHubRateLimitError extends Error {
-  status = 403;
+class UpstreamProfileError extends Error {
+  status = 503;
 
   constructor() {
-    super('GitHub rate limit hit. Try again in a minute.');
+    super('Deterministic upstream failure while reading the profile.');
   }
 }
 
@@ -37,7 +37,7 @@ export async function getFlakyProfile(handle: string): Promise<FlakyProfile> {
   attempts.set(lower, attempt);
 
   if (!ready.has(lower) && attempt === 1) {
-    throw new GitHubRateLimitError();
+    throw new UpstreamProfileError();
   }
 
   return {
@@ -47,8 +47,8 @@ export async function getFlakyProfile(handle: string): Promise<FlakyProfile> {
   };
 }
 
-export async function FlakyProfilePanel(props: { handle: string }) {
-  const profile = await getFlakyProfile(props.handle);
+export async function FlakyProfilePanel({ handle }: { handle: string }) {
+  const profile = await getFlakyProfile(handle);
 
   return (
     <div className="panel">

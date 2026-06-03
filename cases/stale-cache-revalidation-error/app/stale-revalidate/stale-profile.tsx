@@ -7,11 +7,11 @@ type StaleProfile = {
   status: 'fallback' | 'success';
 };
 
-class GitHubRateLimitError extends Error {
-  status = 403;
+class UpstreamRevalidationError extends Error {
+  status = 503;
 
   constructor() {
-    super('GitHub rate limit hit. Try again in a minute.');
+    super('Deterministic upstream failure during cache revalidation.');
   }
 }
 
@@ -43,7 +43,7 @@ export async function getStaleProfile(handle: string): Promise<StaleProfile> {
   attempts.set(lower, attempt);
 
   if (shouldFail.has(lower)) {
-    throw new GitHubRateLimitError();
+    throw new UpstreamRevalidationError();
   }
 
   return {
@@ -105,7 +105,7 @@ export async function FallbackStaleProfilePanel({ handle }: { handle: string }) 
 
   return (
     <div className="panel">
-      <p className="muted">Cached profile payload that catches a 403 and returns fallback data</p>
+      <p className="muted">Cached profile payload that catches the deterministic upstream error and returns fallback data</p>
       <h1>@{profile.handle}</h1>
       <p>
         <span className="mono">generatedAt:</span> {profile.generatedAt.toISOString()}

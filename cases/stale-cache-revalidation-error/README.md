@@ -57,11 +57,24 @@ Expected: if a stale revalidation fails, the previous successful cache entry sho
 
 Actual: the fallback can become the cached value. That mirrors the app bug where returning `null` or fallback data from `use cache` avoided a crash, but replaced a previously good profile with an error-like cache entry.
 
+## Whole App Break Repro
+
+Open <http://localhost:3000/escaped-revalidation/icyJoseph>.
+
+1. Click **Reset**.
+2. Click **Warm success**.
+3. Click **Arm escaped failure**.
+4. Wait at least one second so the cached entry is stale.
+5. Refresh the page in `next start` or production.
+
+The route includes stable sibling UI and a route-level `error.tsx`. A normal render error should be contained by that boundary. The failure being demonstrated escapes that boundary path, so the app-level symptom is a failed request, process-level error, or interrupted stream instead of a local fallback.
+
 ## Related Routes
 
 - `/flaky/icyJoseph`: first cached render throws; the error UI can warm the same cache tag.
 - `/flaky-double/icyJoseph`: two sibling streamed regions read the same flaky cached profile.
 - `/stale-revalidate-fallback/icyJoseph`: catches the stale upstream failure and demonstrates fallback-cache poisoning.
+- `/escaped-revalidation/icyJoseph`: stable sibling UI plus an escaped async failure that is not contained by route `error.tsx`.
 - `/icyJoseph`: runtime prefetch route with a cached payload that includes a real `Date`.
 - `/control/icyJoseph`: same cached `Date` payload, no force-runtime prefetch export.
 - `/string/icyJoseph`: same force-runtime prefetch export, cached timestamp serialized as a string.

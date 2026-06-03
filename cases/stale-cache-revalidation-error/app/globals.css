@@ -53,6 +53,10 @@ a {
   background: #111216;
 }
 
+.panel h2 {
+  margin-top: 0;
+}
+
 .steps h2 {
   margin-top: 0;
 }
@@ -68,6 +72,14 @@ a {
 
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.stable {
+  border-color: rgb(34 211 238 / 28%);
+}
+
+.warning {
+  border-color: rgb(251 191 36 / 34%);
 }
 
 .actions {

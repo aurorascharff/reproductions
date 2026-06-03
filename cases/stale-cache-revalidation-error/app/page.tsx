@@ -43,6 +43,16 @@ export default function HomePage() {
         ))}
       </div>
 
+      <h2>Whole app break repro</h2>
+      <div className="grid">
+        {HANDLES.map(handle => (
+          <Link className="card" href={`/escaped-revalidation/${handle}` as Route} key={handle}>
+            <strong>@{handle}</strong>
+            <p className="muted">stable UI plus an escaped async failure that is not contained by error.tsx</p>
+          </Link>
+        ))}
+      </div>
+
       <h2>Buggy route</h2>
       <div className="grid">
         {HANDLES.map(handle => (

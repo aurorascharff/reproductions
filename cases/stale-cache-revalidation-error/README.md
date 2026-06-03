@@ -4,6 +4,8 @@ Minimal repro for a cached route that has a valid stale value, then surfaces a G
 
 The app uses Next.js 16 canary with `cacheComponents`, `cachedNavigations`, and routes that mimic a profile page whose GitHub-backed data can become stale.
 
+Deployment: <https://stale-cache-revalidation-error.vercel.app>
+
 ## Setup
 
 ```bash

@@ -15,13 +15,9 @@ export default function EscapedRevalidationError({ error, reset }: ErrorProps) {
   return (
     <main className="page">
       <Link href="/">Back</Link>
-      <p className="muted">Escaped revalidation repro</p>
       <h1>Route error boundary</h1>
       <div className="panel">
-        <p>
-          If you see only this page, the error was caught by <span className="mono">error.tsx</span>. The app-break
-          symptom is different: the request fails or the process exits before this boundary can contain the failure.
-        </p>
+        <p>If this renders, the route boundary caught the error. The bug is when the request fails before this page can render.</p>
         <p>{error.message}</p>
         {error.digest ? (
           <p className="muted">

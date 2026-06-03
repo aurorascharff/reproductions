@@ -2,7 +2,6 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 type EscapedProfile = {
   attempt: number;
-  generatedAt: Date;
   handle: string;
   status: 'armed' | 'success';
 };
@@ -45,7 +44,6 @@ export async function getEscapedProfile(handle: string): Promise<EscapedProfile>
 
     return {
       attempt,
-      generatedAt: new Date(),
       handle: lower,
       status: 'armed',
     };
@@ -53,7 +51,6 @@ export async function getEscapedProfile(handle: string): Promise<EscapedProfile>
 
   return {
     attempt,
-    generatedAt: new Date(),
     handle: lower,
     status: 'success',
   };
@@ -64,17 +61,10 @@ export async function EscapedProfilePanel({ handle }: { handle: string }) {
 
   return (
     <div className="panel">
-      <p className="muted">Cached region with 1s revalidate</p>
-      <h1>@{profile.handle}</h1>
-      <p>
-        <span className="mono">generatedAt:</span> {profile.generatedAt.toISOString()}
-      </p>
-      <p>
-        <span className="mono">attempt:</span> {profile.attempt}
-      </p>
-      <p>
-        <span className="mono">status:</span> {profile.status}
-      </p>
+      <p className="muted">Cached value</p>
+      <h2>@{profile.handle}</h2>
+      <p className="mono">attempt {profile.attempt}</p>
+      <p className="mono">status {profile.status}</p>
     </div>
   );
 }

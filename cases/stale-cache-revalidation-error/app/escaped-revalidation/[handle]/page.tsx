@@ -13,8 +13,7 @@ export default function EscapedRevalidationPage({ params }: PageProps) {
   return (
     <main className="page">
       <Link href="/">Back</Link>
-      <p className="muted">Escaped revalidation repro</p>
-      <Suspense fallback={<div className="panel muted">Loading escaped revalidation repro...</div>}>
+      <Suspense fallback={<div className="panel muted">Loading repro...</div>}>
         <EscapedRevalidationRepro params={params} />
       </Suspense>
     </main>
@@ -26,22 +25,14 @@ async function EscapedRevalidationRepro({ params }: PageProps) {
 
   return (
     <>
-      <h1>@{handle}</h1>
+      <h1>Escaped cached failure</h1>
       <p className="muted">
-        This route demonstrates the failure mode where cached async work escapes the route error boundary and can break
-        the whole response instead of rendering a contained error UI.
+        Warm a cached value, arm a deterministic async failure, wait one second, then refresh. Expected: the route error
+        boundary catches it or the stale value remains. Actual: the response can fail before the boundary contains it.
       </p>
       <EscapedControls handle={handle} />
 
-      <div className="panel stable">
-        <h2>Stable sibling UI</h2>
-        <p>
-          This section does not read the cached profile. If the failure were contained by a nearby boundary, this shell
-          would keep rendering. When the request or process is interrupted, this stable UI is lost too.
-        </p>
-      </div>
-
-      <Suspense fallback={<div className="panel muted">Loading cached profile region...</div>}>
+      <Suspense fallback={<div className="panel muted">Loading cached value...</div>}>
         <EscapedProfilePanel handle={handle} />
       </Suspense>
     </>

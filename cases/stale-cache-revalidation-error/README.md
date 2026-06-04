@@ -1,6 +1,6 @@
-# stale-cache-revalidation-error
+# use-cache-remote-revalidation-error
 
-Minimal repro for a cached route that has a valid stale value, then triggers a deterministic async failure after stale revalidation.
+Minimal repro for a `use cache: remote` entry that has a valid stale value, then triggers a deterministic async failure during revalidation.
 
 The app uses Next.js 16 canary with `cacheComponents` and `cachedNavigations`.
 
@@ -27,7 +27,7 @@ Repro:
 4. Wait at least one second so the cached entry is stale.
 5. Refresh the page in `next start` or production.
 
-Expected: the route error boundary catches the failure, or the stale cached value remains visible without a server error.
+Expected: the stale cached value remains visible and the failed remote revalidation is contained.
 
 Actual: the stale revalidation failure escapes the route boundary. In `next start`, the browser may keep showing the stale cached value while the terminal logs:
 
@@ -36,18 +36,6 @@ Error: Deterministic async failure escaped the route error boundary.
 ```
 
 In production this can show up as a failed request, process-level error, or interrupted stream.
-
-## Error Boundary Current Time
-
-Open <http://localhost:3000/error-current-time/icyJoseph>.
-
-1. Run `pnpm build`.
-2. Notice the build passes because `error.tsx` is not rendered during build.
-3. Open the failing route from the page.
-
-Expected: either the build catches the unsafe `Date.now()` in `error.tsx`, or the runtime boundary renders normally.
-
-Actual: the unsafe current-time read is only discovered when the error boundary renders.
 
 ## Production Symptom
 

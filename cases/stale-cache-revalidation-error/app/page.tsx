@@ -4,13 +4,12 @@ import type { Route } from 'next';
 export default function HomePage() {
   return (
     <main className="page">
-      <h1>stale cache revalidation error</h1>
-      <p className="muted">A cached value becomes stale, revalidates, and an async failure escapes the route boundary.</p>
-      <p>
-        <Link href={'/escaped-revalidation/icyJoseph' as Route}>Open the repro</Link>
+      <h1>use cache: remote revalidation escape</h1>
+      <p className="muted">
+        A remote cached value is served stale, then its background revalidation throws outside the route error boundary.
       </p>
       <p>
-        <Link href={'/error-current-time/icyJoseph' as Route}>Open the error.tsx current time repro</Link>
+        <Link href={'/escaped-revalidation/icyJoseph' as Route}>Open the repro</Link>
       </p>
     </main>
   );

@@ -28,7 +28,7 @@ export function resetEscapedRevalidation(handle: string) {
 }
 
 export async function getEscapedProfile(handle: string): Promise<EscapedProfile> {
-  'use cache';
+  'use cache: remote';
   cacheTag(`escaped-profile-${handle}`);
   cacheLife({ expire: 3600, revalidate: 1, stale: 1 });
 

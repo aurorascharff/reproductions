@@ -31,10 +31,10 @@ async function EscapedRevalidationRepro({ params, searchParams }: PageProps) {
 
   return (
     <>
-      <h1>Escaped cached failure</h1>
+      <h1>use cache: remote failure</h1>
       <p className="muted">
-        The normal throw renders <span className="mono">error.tsx</span>. The cached revalidation throw escapes to the
-        server log instead.
+        The normal throw renders <span className="mono">error.tsx</span>. The remote cache revalidation throw should not
+        break the app, but it escapes to the server log instead.
       </p>
       <EscapedControls handle={handle} />
 

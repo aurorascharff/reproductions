@@ -10,9 +10,10 @@ export function EscapedControls({ handle }: EscapedControlsProps) {
   return (
     <div className="panel">
       <ol>
-        <li>Click Normal throw. It should render the route error boundary.</li>
-        <li>Go back, then Reset, Warm success, Arm escaped failure.</li>
-        <li>Wait one second and refresh. The failure should appear in the server log, not this boundary.</li>
+        <li>Click Normal throw to confirm the route error boundary works.</li>
+        <li>Reset, then Warm success to create a remote cached value.</li>
+        <li>Arm escaped failure, wait one second, then refresh.</li>
+        <li>The stale value stays visible, but the revalidation failure escapes in the server log.</li>
       </ol>
       <div className="actions">
         <form action={resetEscapedProfileAction}>

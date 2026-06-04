@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+const moduleRenderedAt = Date.now();
+
 type ErrorProps = {
   error: Error & { digest?: string };
   reset: () => void;
@@ -20,6 +22,9 @@ export default function ErrorCurrentTimeBoundary({ error, reset }: ErrorProps) {
         <p className="mono">{error.message}</p>
         <p>
           <span className="mono">Date.now():</span> {renderedAt}
+        </p>
+        <p>
+          <span className="mono">module Date.now():</span> {moduleRenderedAt}
         </p>
         {error.digest ? (
           <p className="muted">

@@ -1,0 +1,8 @@
+packages:
+  - .
+
+minimumReleaseAge: 2880
+minimumReleaseAgeExclude:
+  - "@next/*"
+  - eslint-config-next
+  - next

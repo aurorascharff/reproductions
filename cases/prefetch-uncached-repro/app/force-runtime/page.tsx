@@ -21,14 +21,13 @@ async function UncachedSection() {
 
 export const unstable_prefetch = "force-runtime";
 
-export default function ForceRuntimePage() {
+export default function AllowRuntimePage() {
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-4 p-8 font-sans">
       <h1 className="text-xl font-semibold">force-runtime page</h1>
       <p className="text-sm text-zinc-700">
-        With <code>unstable_prefetch = &apos;force-runtime&apos;</code> set on
-        this page, viewport prefetch from / SHOULD invoke uncached server code
-        (this is the documented behavior).
+        With <code>unstable_prefetch = &apos;force-runtime&apos;</code> set on this page,
+        viewport prefetch from / SHOULD invoke uncached server code.
       </p>
       <Suspense fallback={<p className="text-sm text-zinc-500">loading…</p>}>
         <UncachedSection />

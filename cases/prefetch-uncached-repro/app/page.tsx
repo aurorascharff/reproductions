@@ -1,34 +1,53 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { Suspense, cache } from "react";
+import { readRecentlyPlayed } from "./lib/store";
 
-export default function Page() {
+const getCurrentUser = cache(async () => {
+  "use cache: private";
+  const store = await cookies();
+  return store.get("session")?.value ?? "anon";
+});
+
+// Mirrors next-beats `getRecentlyPlayed`: React `cache()` for per-request
+// dedup, awaits a `'use cache: private'` helper, then hits mutable state.
+// Has no cache tag of its own and no `connection()`.
+const getRecentlyPlayed = cache(async () => {
+  const user = await getCurrentUser();
+  await new Promise((r) => setTimeout(r, 800));
+  const tracks = readRecentlyPlayed(user);
+  console.log("[repro] getRecentlyPlayed ran", { user, tracks });
+  return { user, tracks, renderedAt: new Date().toISOString() };
+});
+
+async function QuickPlayGrid() {
+  const { tracks, renderedAt } = await getRecentlyPlayed();
   return (
-    <main className="min-h-screen space-y-4 p-12">
-      <h1 className="text-2xl font-bold">prefetch + uncached repro</h1>
-      <p className="text-sm text-zinc-700">
-        With <code>partialPrefetching: true</code> +{" "}
-        <code>cacheComponents</code>, each link below is prefetched on viewport.
-        Watch the server log for <code>UNCACHED RAN</code> entries.
-      </p>
-      <ul className="space-y-2">
-        <li>
-          <Link href="/uncached" className="underline" prefetch={true}>
-            A. /uncached (page has no <code>prefetch</code> export)
-          </Link>
-        </li>
-        <li>
-          <Link href="/allow-runtime" className="underline" prefetch={true}>
-            B. /allow-runtime (page exports{" "}
-            <code>prefetch = &apos;allow-runtime&apos;</code>)
-          </Link>
-        </li>
-      </ul>
-      <p className="text-sm text-zinc-700">
-        Both pages have an uncached section using{" "}
-        <code>await connection()</code> inside a Suspense boundary. Per the
-        docs, <code>connection()</code> means &quot;always run per
-        request&quot;, so neither prefetch should invoke the uncached function.
-        They should only run on actual navigation.
-      </p>
+    <div className="rounded border border-zinc-300 p-4 text-sm">
+      <div className="mb-2 text-xs text-zinc-500">rendered at {renderedAt}</div>
+      {tracks.length === 0 ? (
+        <p>Nothing played yet.</p>
+      ) : (
+        <ul className="list-disc pl-5">
+          {tracks.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// Same opt-in as next-beats home: the segment is runtime-prefetched.
+export const prefetch = "allow-runtime";
+
+export default function Home() {
+  return (
+    <main className="mx-auto flex max-w-2xl flex-col gap-4 p-8 font-sans">
+      <h1 className="text-xl font-semibold">Recently Played</h1>
+      <Suspense fallback={<p className="text-sm text-zinc-500">loading…</p>}>
+        <QuickPlayGrid />
+      </Suspense>
     </main>
   );
 }

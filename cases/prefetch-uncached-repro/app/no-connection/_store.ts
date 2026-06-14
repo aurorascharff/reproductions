@@ -1,10 +1,7 @@
-// In-memory shared via filesystem so the route handler and page render
-// (which may run in different workers) see the same store.
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 
-const FILE = path.join(os.tmpdir(), "prefetch-uncached-repro-store.json");
+const FILE = path.join(process.cwd(), ".repro-store.json");
 
 function load(): Record<string, number> {
   try {
@@ -13,14 +10,16 @@ function load(): Record<string, number> {
     return {};
   }
 }
+
 function save(data: Record<string, number>) {
   fs.writeFileSync(FILE, JSON.stringify(data));
 }
 
-export function read(user: string): number {
+export function readCount(user: string): number {
   return load()[user] ?? 0;
 }
-export function bump(user: string): number {
+
+export function bumpCount(user: string): number {
   const data = load();
   const next = (data[user] ?? 0) + 1;
   data[user] = next;

@@ -1,14 +1,8 @@
 import { cookies } from "next/headers";
-import { recordPlay } from "../../lib/store";
+import { bump } from "../../lib/store";
 
-// POST /api/play   body: { track: string }
-// Mutates server state. The home page's `QuickPlayGrid` query is uncached, so
-// no revalidation is needed.
-export async function POST(req: Request) {
+export async function POST() {
   const store = await cookies();
   const user = store.get("session")?.value ?? "anon";
-  const { track } = await req.json();
-  recordPlay(user, track);
-  console.log("[repro] recorded play", { user, track });
-  return new Response(null, { status: 204 });
+  return Response.json({ count: bump(user) });
 }

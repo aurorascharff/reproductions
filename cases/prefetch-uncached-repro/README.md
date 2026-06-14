@@ -1,60 +1,54 @@
-# `prefetch = 'allow-runtime'` reuses a stale runtime prefetch when a mutation in another route doesn't invalidate it
+# `prefetch = 'allow-runtime'` reuses an uncached `<Suspense>` payload across navigations
 
 Next.js `16.3.0-canary.48` with `cacheComponents: true` + `partialPrefetching: true` + `experimental.appShells: true`.
 
-Live preview: <https://prefetch-uncached-repro-qfodui8ep-aurorascharff-7894s-projects.vercel.app>
+Live preview: <https://prefetch-uncached-repro-8m1m1kvt0-aurorascharff-7894s-projects.vercel.app>
 
 ## Setup
 
-Two routes:
+The home page (`/`) exports `prefetch = 'allow-runtime'` and renders this:
 
-- `/` — the home page, exports `prefetch = 'allow-runtime'`. Renders a `<Suspense>` boundary around `QuickPlayGrid`. Grid reads a per-user list from a tiny on-disk store; the read goes through a React `cache()` wrapper that awaits a `'use cache: private'` helper for the session cookie. No `connection()`, no `cacheTag`.
-- `/track` — a client component with buttons that POST to `/api/play`. The route handler mutates the store but does NOT call `revalidateTag` / `revalidatePath` (matching the way the real app records plays as a fire-and-forget background fetch).
+```tsx
+<Suspense fallback={...}>
+  <QuickPlayGrid />
+</Suspense>
+```
 
-This mirrors next-beats' home page (`getRecentlyPlayed` + `<Suspense fallback={<QuickPlayGridSkeleton />}>`) and its `/api/play` handler (revalidates `tracks` / `track-${id}` / `discover:*` but not the recently-played list).
+`QuickPlayGrid` reads a per-user list via a query wrapped in React `cache()` that awaits a `'use cache: private'` helper for the session cookie. The query itself has:
+
+- **no `'use cache'`**
+- **no `cacheTag` / `cacheLife`**
+- **no `connection()`**
+
+It's just an ordinary uncached read of mutable server state, behind a Suspense boundary, like any other dynamic query in an app router page.
+
+`/track` POSTs to `/api/play`, which mutates that mutable state.
 
 ## Repro
 
-```bash
-pnpm install
-pnpm build
-PORT=3010 pnpm start
-```
-
-In a real browser at <http://localhost:3010>:
-
-1. Land on `/`. The grid renders `Nothing played yet.`
-2. Click `Track`, then click any track button. The POST mutates the server store.
-3. Click `Home`.
+1. Open the home page. Grid says `Nothing played yet.`
+2. Click **Track**. Click any track to record a play.
+3. Click **Home**.
 
 ### Expected
 
-The runtime-prefetched home payload is no longer valid because the underlying state changed. Either Next.js should re-run the segment on navigation or there should be a way to invalidate the runtime-prefetch entry for `/`. The grid should re-render with the just-played track.
+`QuickPlayGrid` is uncached. On every navigation back to `/`, the Suspense boundary should resuspend and re-run the query. The grid should show the just-played track.
 
 ### Observed
 
-The grid shows `Nothing played yet.` — the prefetched payload from before the mutation is reused. The server log shows no `getRecentlyPlayed ran` after the navigation. Reloading the page (`Cmd-R`) fixes it because that bypasses the router cache and re-fetches.
+The grid still says `Nothing played yet.` The Suspense fallback does NOT flash. The server log shows no `getRecentlyPlayed ran` after the navigation. A hard reload (`Cmd-R`) renders the correct list, confirming the server state is fine — only the client router cache is wrong.
 
 ## Why this matters
 
-There's no way for `/api/play` to know which segments to invalidate. The whole point of `prefetch = 'allow-runtime'` is to serve personalized content instantly, but personalized content is exactly the content most likely to be mutated by background requests that don't go through a server action or `revalidateTag`.
+`prefetch = 'allow-runtime'` runs the segment at runtime to embed a per-user prefetch payload in the initial document. That payload includes the result of `QuickPlayGrid`, even though the component is uncached and lives behind `<Suspense>`. On subsequent client-side navigations to `/`, the router serves this prefetched payload as-is without re-running the segment.
 
-This was reproduced on the deployed next-beats app (<https://next-beats.dev>):
-
-- Sign in, play "Pixel Perfect" on `/track/t16`, click `Home`.
-- Recently Played shows `Nothing played yet.` until a hard reload.
+There is no `'use cache'` and no `cacheTag` on this query, so there's no tag the mutation could revalidate. The user has no opt-out: any uncached query behind `<Suspense>` on a runtime-prefetched route gets baked into the prefetch and frozen for the router-cache lifetime.
 
 ## Files
 
 - `next.config.ts`: `cacheComponents: true`, `partialPrefetching: true`, `experimental.appShells: true`
-- `app/layout.tsx`: nav with `<Link prefetch={true}>`
-- `app/page.tsx`: `prefetch = 'allow-runtime'` + `<Suspense>` + `QuickPlayGrid`
+- `app/layout.tsx`: nav with numbered steps and `<Link prefetch={true}>`
+- `app/page.tsx`: `prefetch = 'allow-runtime'` + `<Suspense>` + uncached `QuickPlayGrid`
 - `app/track/page.tsx`: client buttons that POST to `/api/play`
-- `app/api/play/route.ts`: mutates the store, does not revalidate
+- `app/api/play/route.ts`: mutates the store, no revalidation
 - `app/lib/store.ts`: file-backed per-user recently-played list
-
-## Workaround
-
-Tag the query and revalidate it from the mutation. In `app/page.tsx` split into a public `cache()` wrapper + a `'use cache'` inner tagged `recently:${userId}`, then call `revalidateTag(\`recently:${userId}\`)` from `/api/play`.
-
-This works, but it requires the mutation endpoint to know the full list of tags every runtime-prefetched segment depends on — a cross-cutting concern that's easy to forget (as happened in next-beats).

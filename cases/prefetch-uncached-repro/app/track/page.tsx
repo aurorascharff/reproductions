@@ -11,7 +11,8 @@ export default function TrackPage() {
       <h1 className="text-xl font-semibold">Track</h1>
       <p className="text-sm text-zinc-700">
         Click any track to POST <code>/api/play</code>. That mutates server
-        state but does not call <code>revalidateTag</code> / <code>revalidatePath</code>.
+        state but does not call <code>revalidateTag</code> /{" "}
+        <code>revalidatePath</code>.
       </p>
       <ul className="space-y-2">
         {TRACKS.map((t) => (

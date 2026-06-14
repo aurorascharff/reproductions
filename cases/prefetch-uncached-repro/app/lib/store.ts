@@ -1,7 +1,10 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
-const FILE = path.join(process.cwd(), ".repro-store.json");
+// Shared file in the OS tmp dir so route handlers and page renders running in
+// different worker processes (or instances) see the same store.
+const FILE = path.join(os.tmpdir(), "prefetch-uncached-repro-store.json");
 
 function load(): Record<string, string[]> {
   try {

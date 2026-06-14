@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { recordPlay } from "../store";
+import { recordPlay } from "../../lib/store";
 
 // POST /api/play   body: { track: string }
 // Mutates server state but does NOT revalidate any tag — mirrors next-beats'

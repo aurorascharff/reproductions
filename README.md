@@ -30,6 +30,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/instant-favicon-repro`](./cases/instant-favicon-repro) | `app/favicon.ico` vs `unstable_instant` + cache components build failure | Mirrored from **[github.com/aurorascharff/instant-favicon-repro](https://github.com/aurorascharff/instant-favicon-repro)** |
 | [`cases/empty-generate-static-params`](./cases/empty-generate-static-params) | `cacheComponents: true` + `generateStaticParams` returning `[]` → 500 + blank screen at request time | Authored for friction log |
 | [`cases/force-runtime-prefetch-date-payload`](./cases/force-runtime-prefetch-date-payload) | `unstable_prefetch = 'force-runtime'` + cached navigation payload containing `Date` → noisy `Connection closed` profile streams | Authored for friction log |
+| [`cases/not-found-blocking-attribution`](./cases/not-found-blocking-attribution) | `cacheComponents` + root layout `cookies()` → `next build` fails on synthetic `/_not-found` without naming the root layout | Authored for friction log |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

@@ -2,7 +2,7 @@
 // happens next: the build then fails on the synthetic `/_not-found` route,
 // which has no user file — even though the real cause is the root layout's
 // `cookies()` call.
-export const instant = false
+export const instant = false;
 
 export default function Page() {
   return (
@@ -10,5 +10,5 @@ export default function Page() {
       <h1>Home</h1>
       <p>This page opts out. The build still fails on /_not-found.</p>
     </main>
-  )
+  );
 }

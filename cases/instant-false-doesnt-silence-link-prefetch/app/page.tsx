@@ -13,7 +13,9 @@ import Link from "next/link";
 //   /target-partial      → SILENT (prefetch = 'partial' is the only per-route fix)
 export default function Home() {
   return (
-    <main style={{ display: "flex", flexDirection: "column", gap: 12, padding: 24 }}>
+    <main
+      style={{ display: "flex", flexDirection: "column", gap: 12, padding: 24 }}
+    >
       <h1>link-prefetch-partial: which per-route opt-out silences it?</h1>
       <p>
         Click each link (navigate — the warning fires on navigation, not hover).
@@ -29,11 +31,13 @@ export default function Home() {
       </Link>
 
       <Link href="/target-allow-runtime" prefetch={true}>
-        → /target-allow-runtime (prefetch = &apos;allow-runtime&apos; — STILL WARNS)
+        → /target-allow-runtime (prefetch = &apos;allow-runtime&apos; — STILL
+        WARNS)
       </Link>
 
       <Link href="/target-partial" prefetch={true}>
-        → /target-partial (prefetch = &apos;partial&apos; — SILENT, the only fix)
+        → /target-partial (prefetch = &apos;partial&apos; — SILENT, the only
+        fix)
       </Link>
     </main>
   );

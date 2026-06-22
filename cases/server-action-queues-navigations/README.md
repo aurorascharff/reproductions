@@ -3,26 +3,15 @@
 Deployment: <https://server-action-queues-navigations.labs.vercel.dev>
 
 Minimal repro: a fire-and-forget Server Action holds the next `<Link>` click
-when the destination's prefetched RSC was tagged with something the action
-invalidates.
+because Server Action responses and navigation results go through the App
+Router's same dispatch queue. The next navigation can't commit until the
+in-flight action's response (and its RSC re-render of the current route)
+has been applied.
 
-## The mechanic
-
-- Destination has a cached function tagged `'items'` and is prefetched.
-- Action does `updateTag('items')` (after a 1.5s sleep that mimics a real DB
-  write).
-- User clicks the action button, then immediately clicks the prefetched link.
-
-The link's prefetched RSC payload is now known-stale — the action just
-invalidated the tag it was built from. The router can't commit the stale
-prefetch, and it can't render a fresh one until the action returns (the
-action's response is what carries the new RSC for the invalidated tag). So
-the navigation sits until the action completes.
-
-This is not specific to fire-and-forget. The same thing happens with any
-Server Action whose effects overlap the next destination — the router has
-to apply the action's RSC update before it commits the navigation, or the
-user would land on a stale page they just invalidated.
+When the action also `updateTag`s a tag the destination reads, the
+destination's `<Suspense>`'d data re-fetches once the click commits and
+shows the post-action value — so the user lands on fresh content. The cost
+is the click felt non-responsive while the action was in flight.
 
 ## Setup
 
@@ -33,24 +22,36 @@ pnpm dev
 # open http://localhost:3000
 ```
 
+Or `pnpm build && pnpm start` for the production behavior — the queueing is
+visible in both, but the timing is cleaner in production.
+
 ## What to do
 
-1. Click **Go to destination** on its own. It commits in a few ms — the
-   destination is `'use cache'`'d and prefetched.
+1. Click **Go to destination** on its own → instant (~10ms). The destination
+   shows the same count as Home.
 2. Reload. Click **Fire Server Action**, then *immediately* click
-   **Go to destination**. The navigation hangs for ~1.5s, then commits.
-   The button next to it stays in its "Working…" state for the same window
-   — they finish at the same time, because the navigation is waiting for the
-   action's invalidation to land first.
+   **Go to destination**. The navigation hangs for ~half a second while the
+   action runs; when it commits, the destination shows the *new* count.
+
+The button next to the link reports `action took Nms`. Compare that to how
+long the link click felt — they overlap. The router can't commit the
+navigation until the action's RSC update has been applied.
+
+## What this isn't about
+
+- **Not transitions.** The call site is `void slowAction()` — no `await`, no
+  `startTransition`. The queueing is the App Router's, not React's.
+- **Not the destination being slow.** `getCount()` is a cached read.
+  Without the action firing, the click commits in milliseconds.
 
 ## Workaround for background-only writes
 
-When the write doesn't actually need to invalidate the destination's cache
-on the same click — pure telemetry, view pings, play counters — bypass the
-queue by going through a Route Handler. Route Handler calls don't enter
-the router's dispatch queue, so the next navigation commits independently.
-`revalidateTag` still works from inside a Route Handler if you do want
-eventual invalidation.
+When the write doesn't actually need read-your-own-writes on the next
+navigation — pure telemetry, view pings, play counters — bypass the queue
+by going through a Route Handler. Route Handler calls don't enter the
+router's dispatch queue, so the next navigation commits independently.
+`revalidateTag` still works from inside a Route Handler if you want eventual
+invalidation.
 
 ```ts
 // Instead of
@@ -72,14 +73,13 @@ void fetch("/api/play", {
 - [`app/actions.ts`](./app/actions.ts) — `bumpItems()`: sleep 1.5s, increment
   the shared counter, then `updateTag('items')`.
 - [`app/destination/page.tsx`](./app/destination/page.tsx) — reads `getCount()`,
-  shows the value that was waited on.
+  shows the post-action value once the navigation commits.
 - [`app/data.ts`](./app/data.ts) — `getCount()`: `'use cache'` + `cacheTag('items')`.
-- [`app/store.ts`](./app/store.ts) — in-memory counter so the value actually
-  changes between fetches.
+- [`app/store.ts`](./app/store.ts) — file-backed counter so the value
+  actually changes between fetches and persists across worker processes.
 
 ## Source
 
 [`packages/next/src/client/components/use-action-queue.ts`](https://github.com/vercel/next.js/blob/canary/packages/next/src/client/components/use-action-queue.ts)
 — `dispatchAppRouterAction` serializes Server Action responses and
-navigation results through the same queue so cache invalidations apply
-before any downstream navigation commits.
+navigation results through the same queue.

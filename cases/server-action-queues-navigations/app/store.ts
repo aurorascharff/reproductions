@@ -1,13 +1,31 @@
-// Tiny in-memory store. In a real app this would be a database; we just need
-// the value to actually change between calls so the cache invalidation has
-// something to demonstrate.
-let count = 0;
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
-export function readCount() {
-  return count;
+// File-backed counter so the value persists across worker processes and
+// across requests in dev/prod. Lets us actually prove that the destination
+// renders the post-action value after the queued navigation commits.
+const STATE_DIR = join(tmpdir(), "server-action-queues-navigations");
+const STATE_FILE = join(STATE_DIR, "count.txt");
+
+function ensureDir() {
+  try {
+    mkdirSync(STATE_DIR, { recursive: true });
+  } catch {}
 }
 
-export function bumpCount() {
-  count += 1;
-  return count;
+export function readCount(): number {
+  ensureDir();
+  try {
+    return parseInt(readFileSync(STATE_FILE, "utf8"), 10) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function bumpCount(): number {
+  ensureDir();
+  const next = readCount() + 1;
+  writeFileSync(STATE_FILE, String(next));
+  return next;
 }

@@ -25,18 +25,20 @@ pnpm dev
 
 ## Steps
 
-1. **Cold click is instant.** Reload the page, then click **Target A**. It
-   commits in a couple of milliseconds — the destination is cached with
-   `'use cache'` and was prefetched by `<Link prefetch={true}>`.
+1. **Cold click is instant.** Reload the page, then click **Inbox** in the
+   sidebar. It commits in a couple of milliseconds — the destination is
+   cached with `'use cache'` and was prefetched by `<Link prefetch={true}>`.
 
-2. **Click after a fire-and-forget action is delayed.** Reload the page, then:
-   1. Click the **Fire** button. This calls `void slowAction()` — fire-and-forget,
-      no `await`, no `startTransition`. The action just sleeps 1.5 seconds
-      server-side.
-   2. **Immediately** click **Target B**.
+2. **Click after a fire-and-forget action is delayed.** Reload the page,
+   then:
+   1. Click **Mark all read**. This calls `void markAllRead()` —
+      fire-and-forget, no `await`, no `startTransition`. The action just
+      sleeps 1.5 seconds server-side. The button shows "Working…" so you can
+      see when the call is in flight.
+   2. **Immediately** click **Inbox** in the sidebar.
 
-   The navigation will sit for ~1.5s before committing — the entire duration
-   of the in-flight action — even though Target B was fully prefetched and the
+   The navigation sits for ~1.5s before committing — the entire duration of
+   the in-flight action — even though Inbox is fully prefetched and the
    action has nothing to do with it.
 
 ## Expected vs actual
@@ -64,22 +66,25 @@ works from inside a Route Handler if invalidation is needed.
 
 ```ts
 // Instead of
-void recordPlay(trackId); // Server Action — queued
+void markAllRead(); // Server Action — queued
 
 // Do
-void fetch("/api/play", {
-  method: "POST",
-  body: JSON.stringify({ trackId }),
-  keepalive: true,
-}); // Route Handler — not queued
+void fetch("/api/mark-all-read", { method: "POST", keepalive: true });
+// Route Handler — not queued
 ```
 
 ## Files
 
-- [`app/page.tsx`](./app/page.tsx) — home with two prefetched Links + a button.
-- [`app/actions.ts`](./app/actions.ts) — the `slowAction` Server Action (1.5s sleep, no side effects).
-- [`app/fire-and-forget-button.tsx`](./app/fire-and-forget-button.tsx) — `void slowAction()` on click.
-- [`app/target-a/page.tsx`](./app/target-a/page.tsx), [`app/target-b/page.tsx`](./app/target-b/page.tsx) — cached destinations.
+- [`app/layout.tsx`](./app/layout.tsx) — sidebar with three prefetched links.
+- [`app/page.tsx`](./app/page.tsx) — Home with the Mark all read button and the
+  test steps inline.
+- [`app/actions.ts`](./app/actions.ts) — the `markAllRead` Server Action (1.5s
+  sleep, no side effects).
+- [`app/mark-all-read-button.tsx`](./app/mark-all-read-button.tsx) —
+  `void markAllRead()` on click; surfaces pending state so the in-flight
+  window is visible.
+- [`app/inbox/page.tsx`](./app/inbox/page.tsx),
+  [`app/archive/page.tsx`](./app/archive/page.tsx) — cached destinations.
 
 ## Source
 

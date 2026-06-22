@@ -1,5 +1,7 @@
 # server-action-queues-navigations
 
+Deployment: <https://server-action-queues-navigations.labs.vercel.dev>
+
 Minimal repro showing that a **fire-and-forget Server Action serializes the
 next `<Link>` navigation** — even when the call site doesn't `await` it, isn't
 inside a `startTransition`, and the action has no effect on cached data.

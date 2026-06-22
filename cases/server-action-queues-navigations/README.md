@@ -66,13 +66,16 @@ void fetch("/api/play", {
 
 ## Files
 
-- [`app/page.tsx`](./app/page.tsx) — explanation and the demo.
+- [`app/page.tsx`](./app/page.tsx) — Home reads `getCount()`, renders the demo.
 - [`app/demo.tsx`](./app/demo.tsx) — `void bumpItems()` button next to a
   prefetched `<Link>`.
-- [`app/actions.ts`](./app/actions.ts) — `bumpItems()`: sleep 1.5s, then
-  `updateTag('items')`.
-- [`app/destination/page.tsx`](./app/destination/page.tsx) — cached read
-  tagged `'items'`.
+- [`app/actions.ts`](./app/actions.ts) — `bumpItems()`: sleep 1.5s, increment
+  the shared counter, then `updateTag('items')`.
+- [`app/destination/page.tsx`](./app/destination/page.tsx) — reads `getCount()`,
+  shows the value that was waited on.
+- [`app/data.ts`](./app/data.ts) — `getCount()`: `'use cache'` + `cacheTag('items')`.
+- [`app/store.ts`](./app/store.ts) — in-memory counter so the value actually
+  changes between fetches.
 
 ## Source
 

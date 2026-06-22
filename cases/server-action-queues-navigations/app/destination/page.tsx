@@ -1,36 +1,32 @@
-import { cacheTag } from "next/cache";
-
-async function getItems() {
-  "use cache";
-  cacheTag("items");
-  return ["Item 1", "Item 2", "Item 3"];
-}
+import Link from "next/link";
+import { getCount } from "../data";
 
 export default async function Destination() {
-  const items = await getItems();
+  const count = await getCount();
   return (
     <>
       <h1 style={{ marginTop: 0 }}>Destination</h1>
-      <p style={{ color: "#666", fontSize: 13 }}>
-        Reads a cached function tagged <code>items</code>. The Server Action on
-        Home invalidates that same tag. Until the action&apos;s RSC payload
-        applies, the prefetched copy of this page is stale — so the router
-        holds the navigation until the action returns.
+      <p
+        style={{
+          fontSize: 48,
+          fontWeight: 600,
+          margin: "16px 0",
+          fontFeatureSettings: "'tnum'",
+        }}
+      >
+        count: {count}
       </p>
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {items.map((item) => (
-          <li
-            key={item}
-            style={{
-              padding: "12px 0",
-              borderBottom: "1px solid #eee",
-              fontSize: 14,
-            }}
-          >
-            {item}
-          </li>
-        ))}
-      </ul>
+      <p style={{ color: "#666", fontSize: 13, lineHeight: 1.6 }}>
+        This page reads a cached function tagged <code>items</code>. The action
+        on Home invalidates that tag, so by the time you land here the count is
+        the post-action value — that&apos;s what the router was waiting on
+        before committing the navigation.
+      </p>
+      <p style={{ marginTop: 24 }}>
+        <Link href="/" prefetch={true} style={{ color: "#111" }}>
+          ← back home
+        </Link>
+      </p>
     </>
   );
 }

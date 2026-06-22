@@ -3,15 +3,26 @@
 Deployment: <https://server-action-queues-navigations.labs.vercel.dev>
 
 Minimal repro: a fire-and-forget Server Action holds the next `<Link>` click
-until it returns. The App Router puts Server Action results and navigation
-results in the same dispatch queue and applies them in order — so the next
-navigation can't commit until the previous action's RSC payload has been
-applied.
+when the destination's prefetched RSC was tagged with something the action
+invalidates.
 
-This is **not** about transitions, caching, prefetching, or revalidation.
-The action in this repro does literally nothing (`setTimeout` and return).
-The destination has no `'use cache'`, no `revalidateTag`, no shared state.
-The queueing happens anyway.
+## The mechanic
+
+- Destination has a cached function tagged `'items'` and is prefetched.
+- Action does `updateTag('items')` (after a 1.5s sleep that mimics a real DB
+  write).
+- User clicks the action button, then immediately clicks the prefetched link.
+
+The link's prefetched RSC payload is now known-stale — the action just
+invalidated the tag it was built from. The router can't commit the stale
+prefetch, and it can't render a fresh one until the action returns (the
+action's response is what carries the new RSC for the invalidated tag). So
+the navigation sits until the action completes.
+
+This is not specific to fire-and-forget. The same thing happens with any
+Server Action whose effects overlap the next destination — the router has
+to apply the action's RSC update before it commits the navigation, or the
+user would land on a stale page they just invalidated.
 
 ## Setup
 
@@ -24,41 +35,22 @@ pnpm dev
 
 ## What to do
 
-1. Click **Go to destination** on its own. It commits in a few ms.
+1. Click **Go to destination** on its own. It commits in a few ms — the
+   destination is `'use cache'`'d and prefetched.
 2. Reload. Click **Fire Server Action**, then *immediately* click
    **Go to destination**. The navigation hangs for ~1.5s, then commits.
-   The button next to it stays in its "Working…" state for the same window —
-   they finish at the same time, because the navigation is waiting for the
-   action to land first.
-
-## Expected vs actual
-
-Expected: a Server Action I don't `await` shouldn't gate my next navigation.
-The user perceives the second click as dead.
-
-Actual: the App Router's dispatch queue holds the navigation until the
-action's response (and the RSC re-render it triggers) has been applied to
-the router state. Navigation commits only after the action finishes.
-
-## Why this exists
-
-Every Server Action implicitly re-renders the current route on the server
-and ships back an RSC payload. The router needs to apply that payload
-before processing the next action or navigation — otherwise the user could
-land on a destination that's already been invalidated by the action's
-effects, or miss an `updateTag` they just wrote.
-
-In this repro the action does nothing, so the serialization is pure
-overhead. But the router can't know that from the call site, so it queues
-unconditionally.
+   The button next to it stays in its "Working…" state for the same window
+   — they finish at the same time, because the navigation is waiting for the
+   action's invalidation to land first.
 
 ## Workaround for background-only writes
 
-If the Server Action is pure telemetry — play count, "mark as read",
-view ping — bypass the queue by writing through a Route Handler instead.
-Route Handler calls don't go through `dispatchAppRouterAction`; the next
-navigation commits independently. `revalidateTag` still works from inside
-a Route Handler if you need invalidation.
+When the write doesn't actually need to invalidate the destination's cache
+on the same click — pure telemetry, view pings, play counters — bypass the
+queue by going through a Route Handler. Route Handler calls don't enter
+the router's dispatch queue, so the next navigation commits independently.
+`revalidateTag` still works from inside a Route Handler if you do want
+eventual invalidation.
 
 ```ts
 // Instead of
@@ -75,14 +67,16 @@ void fetch("/api/play", {
 ## Files
 
 - [`app/page.tsx`](./app/page.tsx) — explanation and the demo.
-- [`app/demo.tsx`](./app/demo.tsx) — `void slowAction()` button next to a
-  `<Link>`, with the action's round-trip time displayed.
-- [`app/actions.ts`](./app/actions.ts) — `slowAction()`: sleep 1.5s, return.
-- [`app/destination/page.tsx`](./app/destination/page.tsx) — plain destination,
-  no `'use cache'`, no `revalidateTag`.
+- [`app/demo.tsx`](./app/demo.tsx) — `void bumpItems()` button next to a
+  prefetched `<Link>`.
+- [`app/actions.ts`](./app/actions.ts) — `bumpItems()`: sleep 1.5s, then
+  `updateTag('items')`.
+- [`app/destination/page.tsx`](./app/destination/page.tsx) — cached read
+  tagged `'items'`.
 
 ## Source
 
 [`packages/next/src/client/components/use-action-queue.ts`](https://github.com/vercel/next.js/blob/canary/packages/next/src/client/components/use-action-queue.ts)
-— `dispatchAppRouterAction` serializes all router state updates, including
-Server Action responses and navigation results.
+— `dispatchAppRouterAction` serializes Server Action responses and
+navigation results through the same queue so cache invalidations apply
+before any downstream navigation commits.

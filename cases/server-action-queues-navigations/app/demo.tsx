@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { slowAction } from "./actions";
+import { bumpItems } from "./actions";
 
 export function Demo() {
   const [pending, setPending] = useState(false);
@@ -11,7 +11,7 @@ export function Demo() {
   function fireAction() {
     setPending(true);
     const start = performance.now();
-    void slowAction().finally(() => {
+    void bumpItems().finally(() => {
       setLastMs(Math.round(performance.now() - start));
       setPending(false);
     });
@@ -49,6 +49,7 @@ export function Demo() {
 
       <Link
         href="/destination"
+        prefetch={true}
         style={{
           padding: "10px 16px",
           border: "1px solid #111",
@@ -64,7 +65,7 @@ export function Demo() {
 
       <span style={{ marginLeft: "auto", fontSize: 12, color: "#666" }}>
         {pending
-          ? "action in flight — click the link now"
+          ? "action invalidates 'items' — click the link now"
           : lastMs !== null
             ? `action took ${lastMs}ms`
             : ""}

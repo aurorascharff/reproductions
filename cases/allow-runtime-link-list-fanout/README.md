@@ -40,6 +40,18 @@ The delay here is small (~0.5s, the `'use cache'` latency); the point is the **m
 
 This is a **modest, real** cost — not a freeze. A single Node process handles the concurrent renders fine (IO waits yield), so the delay is bounded by Next's prefetch concurrency and the per-fill latency, not by list length. An earlier version of this repro faked a multi-second stall with an artificial connection pool; that was misleading and has been removed. If a cold nav on the real app feels worse than "brief," the extra cost is elsewhere — real DB/connection latency, or cache-entry generation dedup — and is worth checking on next-beats itself with `NEXT_PRIVATE_DEBUG_CACHE=1`.
 
+## Prefetch order prioritizes the wrong links
+
+The in-viewport scan prefetches the list **bottom-up** — the last link fires first. Clicking ~900ms after a cold load on the live deploy:
+
+| link clicked | position | skeleton | content |
+| --- | --- | --- | --- |
+| `World Grooves` | bottom (prefetched first) | never (cached) | **~50 ms** |
+| `Coffeehouse Folk` | middle | ~60 ms | ~600 ms |
+| `Morning Coffee` | top (prefetched last) | ~60 ms | ~600 ms |
+
+The bottom link is already warm and navigates instantly; the top and middle links aren't ready yet and pay a fresh nav (skeleton + one ~500ms fill). The prefetch budget lands on the bottom of the list first — so if the user's likely target is near the top, it's the **last** to become ready. Same total work, ordered against the click.
+
 ## Why the fan-out still matters
 
 Even when it doesn't slow navigation, `allow-runtime` + `<Link prefetch={true}>` on an unbounded list does N server renders' worth of work per page view, scaling with list length rather than with what the user navigates to. The docs flag this under [*Preventing too many prefetches*](https://preview.nextjs.org/docs/app/guides/prefetching) and ["skip `allow-runtime` when the route is rarely navigated — you pay per visible link"](https://preview.nextjs.org/docs/app/guides/runtime-prefetching).

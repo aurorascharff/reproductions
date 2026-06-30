@@ -5,14 +5,14 @@ export default function Home() {
     <div>
       <h1>NextBeats-ish</h1>
       <p>
-        Hard-load this page, then click a playlist near the <strong>top</strong> of the sidebar
-        (e.g. <em>Morning Coffee</em> or <em>Deep Focus</em>). Watch how long its tracks take to
-        appear — the shell shows instantly, but the content lags for several seconds.
+        Hard-load this page, then click any playlist in the sidebar. The click is{' '}
+        <strong>entirely unresponsive</strong> — no spinner, no skeleton, the URL doesn&apos;t even
+        change — for several seconds, then the page swaps in all at once.
       </p>
       <p style={{ color: '#666' }}>
-        The top links are slowest because the router prefetches the list <em>bottom-up</em>, so the
-        top ones are last in line for the single connection — stuck behind the 20 runtime prerenders
-        that fired on load, before you clicked anything.
+        The route is a blocking route (<code>instant = false</code>, no Suspense fallback), so the
+        navigation is held on the old page until its render resolves — and that render is stuck
+        behind the 20 runtime prerenders the sidebar fired on load.
       </p>
       <p style={{ color: '#666' }}>
         Rebuild with <code>EAGER=0 pnpm build &amp;&amp; pnpm start</code> to feel the same click

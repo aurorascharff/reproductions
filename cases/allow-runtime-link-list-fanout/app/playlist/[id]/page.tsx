@@ -1,21 +1,13 @@
-import { Suspense } from 'react';
 import { getPlaylist } from '@/app/lib/playlists';
 
 export const prefetch = 'allow-runtime';
+// Blocking route: no Suspense boundary, so there's no fallback to stream. The
+// navigation is held on the old page until this render resolves — and under the
+// prefetch storm that render is stuck behind the pool. Result: click → nothing
+// happens for seconds → page swaps in. An entirely unresponsive click.
+export const instant = false;
 
-export default function PlaylistPage({ params }: { params: Promise<{ id: string }> }) {
-  // `params` is runtime data under cacheComponents, so all access stays inside
-  // the Suspense boundary. The App Shell renders the fallback instantly; the
-  // runtime prefetch (allow-runtime) resolves the param + cached content — but
-  // only once it gets a connection from the pool.
-  return (
-    <Suspense fallback={<p style={{ color: '#999' }}>loading playlist…</p>}>
-      <Detail params={params} />
-    </Suspense>
-  );
-}
-
-async function Detail({ params }: { params: Promise<{ id: string }> }) {
+export default async function PlaylistPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const playlist = await getPlaylist(id);
   return (

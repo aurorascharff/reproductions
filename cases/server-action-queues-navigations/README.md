@@ -51,6 +51,17 @@ In real apps this looks like: favorite a track, immediately click
 /favorites, the page doesn't show your new favorite. Refresh and it's
 there. Look like a cache bug, but it's the router queue being bypassable.
 
+This is the same friction we hit in the [next-beats](https://github.com/vercel-labs/next-beats)
+demo. Server Action + immediate `<Link>` click felt like a dead click, and
+the wait read as broken UI rather than as the framework keeping the
+destination consistent. That trade-off is intentional in React's concurrent
+model — transitions hold the previous state mounted rather than flicker to
+a loading screen, on the assumption that the developer will surface pending
+feedback if the wait gets noticeable (`useLinkStatus`, an active state
+swap, anything). Without that affordance, "the framework is being careful"
+and "the framework is broken" look identical to the user. The slow-path
+behavior here is right; the missing piece is making the wait legible.
+
 ## Workaround for background-only writes
 
 When the write doesn't need read-your-own-writes on the next navigation —

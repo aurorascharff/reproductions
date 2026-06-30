@@ -40,7 +40,14 @@ export function Demo() {
         background: "#fafafa",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
         <button
           type="button"
           onClick={fireAction}
@@ -60,7 +67,7 @@ export function Demo() {
 
         <Link
           href="/destination"
-          prefetch={true}
+          prefetch={false}
           style={{
             padding: "10px 16px",
             border: "1px solid #111",

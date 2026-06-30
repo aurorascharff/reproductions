@@ -2,6 +2,8 @@
 
 Next.js `16.3.0-preview.5` with `cacheComponents: true`, `partialPrefetching: true`.
 
+**Live:** [allow-runtime-link-list-fanout.labs.vercel.dev](https://allow-runtime-link-list-fanout.labs.vercel.dev) — hard-load, then click a playlist near the bottom of the list and watch the content lag.
+
 A sidebar of `<Link prefetch={true}>` to `prefetch = 'allow-runtime'` routes fires **one runtime server render per link** the moment the page loads. Under any scarce server resource (a DB connection pool), those renders queue — and the first link the user clicks queues behind them. The click commits to its App Shell instantly, but the content streams in **slowly**, because its render is waiting in line behind the prefetch storm it didn't ask for.
 
 ## Setup

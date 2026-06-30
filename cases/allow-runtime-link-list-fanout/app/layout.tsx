@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ fontFamily: 'system-ui', margin: 0, display: 'flex' }}>
         <aside
           style={{
-            width: 220,
+            width: 240,
             borderRight: '1px solid #ccc',
             padding: 12,
             height: '100vh',
@@ -20,15 +20,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             boxSizing: 'border-box',
           }}
         >
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <strong style={{ display: 'block', padding: '4px 0', fontSize: 13, color: '#666' }}>
+            Your Library {eager ? '(eager prefetch)' : '(prefetch off)'}
+          </strong>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <Link prefetch={eager} href="/">
               Home
             </Link>
             <hr style={{ width: '100%', border: 'none', borderTop: '1px solid #eee' }} />
             {/* Unbounded list. Every link is in the viewport, and every
                 destination is `prefetch = 'allow-runtime'`, so the router fires
-                one runtime prerender per link on load. Add more playlists and
-                the storm grows linearly. */}
+                one runtime prerender per link on load. 20 links → 20 renders
+                queue for the pool before the user clicks anything. */}
             {PLAYLISTS.map(pl => (
               <Link key={pl.id} prefetch={eager} href={`/playlist/${pl.id}`}>
                 {pl.name}
@@ -36,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             ))}
           </nav>
         </aside>
-        <main style={{ padding: 16, flex: 1 }}>{children}</main>
+        <main style={{ padding: 24, flex: 1 }}>{children}</main>
       </body>
     </html>
   );

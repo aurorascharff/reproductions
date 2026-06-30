@@ -40,6 +40,17 @@ The delay here is small (~0.5s, the `'use cache'` latency); the point is the **m
 
 This is a **modest, real** cost — not a freeze. A single Node process handles the concurrent renders fine (IO waits yield), so the delay is bounded by Next's prefetch concurrency and the per-fill latency, not by list length. An earlier version of this repro faked a multi-second stall with an artificial connection pool; that was misleading and has been removed. If a cold nav on the real app feels worse than "brief," the extra cost is elsewhere — real DB/connection latency, or cache-entry generation dedup — and is worth checking on next-beats itself with `NEXT_PRIVATE_DEBUG_CACHE=1`.
 
+## Control: the same route without `allow-runtime`
+
+The sidebar has a second list — **Albums** — pointing at `/album/[id]`, identical to `/playlist/[id]` (same data, same Suspense) but with **no `prefetch = 'allow-runtime'`** (so it uses the default per-route App Shell prefetch). Clicking the same item (`World Grooves`) in each list, ~300ms after a cold load on the live deploy:
+
+| list | route | skeleton | content |
+| --- | --- | --- | --- |
+| Playlists | `allow-runtime` | ~1180 ms (or never) | ~1700 ms |
+| Albums | default (control) | **~85 ms** | ~570 ms |
+
+Without `allow-runtime`, the click commits to the App Shell immediately (skeleton in ~85ms) and content streams in ~570ms. With it, there's ~1.2s of **no feedback** while the navigation waits on the in-flight runtime prefetch. The only difference is the `allow-runtime` export and the load-time fan-out it triggers.
+
 ## Prefetch order prioritizes the wrong links
 
 The in-viewport scan prefetches the list **bottom-up** — the last link fires first. Clicking ~900ms after a cold load on the live deploy:
@@ -69,5 +80,6 @@ Defer each list link's runtime prefetch until intent — hold it at the cheap de
 - `next.config.ts` — `cacheComponents`, `partialPrefetching`
 - `app/layout.tsx` — sidebar with `Home` + 20 `<Link prefetch={true}>` playlist links (`EAGER=0` build flips them off)
 - `app/playlist/[id]/page.tsx` — `prefetch = 'allow-runtime'`, content in `<Suspense>`
+- `app/album/[id]/page.tsx` — the control: same page, **no** `allow-runtime`
 - `app/lib/playlists.ts` — 20 playlists + `getPlaylist` (`'use cache'` with ~500ms latency, logs each fill)
 - `app/page.tsx` — `allow-runtime` home

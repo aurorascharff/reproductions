@@ -1,10 +1,18 @@
 import Link from 'next/link';
 import { PLAYLISTS } from '@/app/lib/playlists';
 
-// Flip the prefetch storm off to feel the difference: `EAGER=0 pnpm build && pnpm start`
-// (build-time — Next constant-folds this, so it must be set for the build, not just
-// `start`). Same click, but no per-link runtime prefetch competing for the pool. See README.
+// Flip the prefetch storm off to feel the difference: `EAGER=0 pnpm build && pnpm start`.
 const eager = process.env.EAGER !== '0';
+
+const sectionLabel: React.CSSProperties = {
+  display: 'block',
+  padding: '10px 0 4px',
+  fontSize: 12,
+  fontWeight: 600,
+  color: '#888',
+  textTransform: 'uppercase',
+  letterSpacing: 0.4,
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ fontFamily: 'system-ui', margin: 0, display: 'flex' }}>
         <aside
           style={{
-            width: 240,
+            width: 260,
             borderRight: '1px solid #ccc',
             padding: 12,
             height: '100vh',
@@ -20,20 +28,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             boxSizing: 'border-box',
           }}
         >
-          <strong style={{ display: 'block', padding: '4px 0', fontSize: 13, color: '#666' }}>
-            Your Library {eager ? '(eager prefetch)' : '(prefetch off)'}
-          </strong>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <Link prefetch={eager} href="/">
               Home
             </Link>
-            <hr style={{ width: '100%', border: 'none', borderTop: '1px solid #eee' }} />
-            {/* Unbounded list. Every link is in the viewport, and every
-                destination is `prefetch = 'allow-runtime'`, so the router fires
-                one runtime prerender per link on load. 20 links → 20 renders
-                queue for the pool before the user clicks anything. */}
+
+            {/* allow-runtime: each link fires a runtime prerender on load. */}
+            <span style={sectionLabel}>Playlists — allow-runtime</span>
             {PLAYLISTS.map(pl => (
               <Link key={pl.id} prefetch={eager} href={`/playlist/${pl.id}`}>
+                {pl.name}
+              </Link>
+            ))}
+
+            {/* control: no allow-runtime → default App Shell prefetch, no fan-out. */}
+            <span style={sectionLabel}>Albums — no allow-runtime</span>
+            {PLAYLISTS.map(pl => (
+              <Link key={pl.id} prefetch={true} href={`/album/${pl.id}`}>
                 {pl.name}
               </Link>
             ))}

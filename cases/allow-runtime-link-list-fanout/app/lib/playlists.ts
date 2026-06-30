@@ -45,7 +45,7 @@ function tracksFor(id: string, name: string) {
 // we're here to find out (run with NEXT_PRIVATE_DEBUG_CACHE=1).
 export async function getPlaylist(id: string) {
   'use cache';
-  console.log(`[fill] ${id} @ ${process.hrtime.bigint()}`);
+  console.log('[fill]', id);
   await delay(500);
   const meta = PLAYLISTS.find(p => p.id === id);
   const name = meta?.name ?? id;

@@ -31,7 +31,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/empty-generate-static-params`](./cases/empty-generate-static-params) | `cacheComponents: true` + `generateStaticParams` returning `[]` → 500 + blank screen at request time | Authored for friction log |
 | [`cases/force-runtime-prefetch-date-payload`](./cases/force-runtime-prefetch-date-payload) | `unstable_prefetch = 'force-runtime'` + cached navigation payload containing `Date` → noisy `Connection closed` profile streams | Authored for friction log |
 | [`cases/not-found-blocking-attribution`](./cases/not-found-blocking-attribution) | `cacheComponents` + root layout `cookies()` → `next build` fails on synthetic `/_not-found` without naming the root layout | Authored for friction log |
-| [`cases/allow-runtime-link-list-fanout`](./cases/allow-runtime-link-list-fanout) | `prefetch = 'allow-runtime'` on every link in an unbounded list → one runtime prerender per link on load; on a blocking route the nav click is entirely unresponsive (no fallback, ~7s) ([live](https://allow-runtime-link-list-fanout.labs.vercel.dev)) | Authored for friction log |
+| [`cases/allow-runtime-link-list-fanout`](./cases/allow-runtime-link-list-fanout) | `prefetch = 'allow-runtime'` on every link in an unbounded list → one runtime prerender per link on load (N server renders per page view); mirrors next-beats' structure ([live](https://allow-runtime-link-list-fanout.labs.vercel.dev)) | Authored for friction log |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

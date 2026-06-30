@@ -23,9 +23,18 @@ This case mirrors next-beats' structure: `allow-runtime` routes behind Suspense 
 
 ## Observed
 
-- On a single hard-load, **all 20** routes are runtime-prefetched: 20 `_rsc=` requests, and the terminal logs `[fill] <id>` for each — before any click.
-- The fills run **~3–4 concurrent** (batched ~500ms apart) — Next's runtime-prefetch concurrency, not a limit added here.
-- **The first click after a cold load has a brief delay** (~a few hundred ms to ~1s): the clicked route's runtime fill has to clear the queue behind the other in-flight prefetch fills. Once the cache is warm, clicks are instant.
+- On a single hard-load, **all 20** routes are runtime-prefetched: ~21 `_rsc=` requests, and the terminal logs `[fill] <id>` for each — before any click.
+- **Clicking a link whose runtime prefetch is still in-flight shows no Suspense fallback.** The router waits for the in-flight `allow-runtime` prefetch (which carries the resolved content) instead of rendering the route's own skeleton — so the click is unresponsive: the old page stays, no skeleton, until the prefetch resolves. Clicking a link whose prefetch hasn't started yet does a fresh nav and *does* show the skeleton.
+
+Measured on the **live Vercel deployment** ([allow-runtime-link-list-fanout.labs.vercel.dev](https://allow-runtime-link-list-fanout.labs.vercel.dev)), clicking ~300ms after a hard-load:
+
+| link clicked | prefetch state | skeleton | content |
+| --- | --- | --- | --- |
+| `World Grooves` (prefetched first) | in-flight | **never shows** | ~520 ms |
+| `Soul Classics` | not yet started | ~90 ms | ~590 ms |
+| `Hip-Hop Heat` | not yet started | ~50 ms | ~580 ms |
+
+The delay here is small (~0.5s, the `'use cache'` latency); the point is the **missing fallback** on in-flight links — with a slower backend or a longer prefetch queue, that no-feedback window grows.
 
 ### Honest note on scale
 
@@ -33,7 +42,7 @@ This is a **modest, real** cost — not a freeze. A single Node process handles 
 
 ## Why the fan-out still matters
 
-Even when it doesn't slow navigation, `allow-runtime` + `<Link prefetch={true}>` on an unbounded list does N server renders' worth of work per page view, scaling with list length rather than with what the user navigates to. The docs flag this under [_Preventing too many prefetches_](https://preview.nextjs.org/docs/app/guides/prefetching) and ["skip `allow-runtime` when the route is rarely navigated — you pay per visible link"](https://preview.nextjs.org/docs/app/guides/runtime-prefetching).
+Even when it doesn't slow navigation, `allow-runtime` + `<Link prefetch={true}>` on an unbounded list does N server renders' worth of work per page view, scaling with list length rather than with what the user navigates to. The docs flag this under [*Preventing too many prefetches*](https://preview.nextjs.org/docs/app/guides/prefetching) and ["skip `allow-runtime` when the route is rarely navigated — you pay per visible link"](https://preview.nextjs.org/docs/app/guides/runtime-prefetching).
 
 ## Workaround
 

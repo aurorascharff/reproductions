@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { PLAYLISTS } from '@/app/lib/playlists';
 
+// Flip the prefetch storm off to feel the difference: `EAGER=0 pnpm build && pnpm start`
+// (build-time — Next constant-folds this, so it must be set for the build, not just
+// `start`). Same click, but no per-link runtime prefetch competing for the pool. See README.
+const eager = process.env.EAGER !== '0';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -16,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         >
           <nav style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <Link prefetch={true} href="/">
+            <Link prefetch={eager} href="/">
               Home
             </Link>
             <hr style={{ width: '100%', border: 'none', borderTop: '1px solid #eee' }} />
@@ -25,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 one runtime prerender per link on load. Add more playlists and
                 the storm grows linearly. */}
             {PLAYLISTS.map(pl => (
-              <Link key={pl.id} prefetch={true} href={`/playlist/${pl.id}`}>
+              <Link key={pl.id} prefetch={eager} href={`/playlist/${pl.id}`}>
                 {pl.name}
               </Link>
             ))}

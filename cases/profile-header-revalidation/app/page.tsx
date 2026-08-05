@@ -11,11 +11,14 @@ export default function HomePage() {
         <Link href="/u/ada">Ada profile</Link>
         <ResetButton />
       </nav>
-      <h1>Profile header revalidation repro</h1>
-      <p className="muted">
-        Repost from home, then navigate back to Ada. The repost action invalidates the home feed, Ada&apos;s profile
-        feed, and Ada&apos;s drop interactions, but not Ada&apos;s user/header tags.
-      </p>
+      <header className="hero">
+        <p className="eyebrow">cache components repro</p>
+        <h1>Profile header revalidation repro</h1>
+        <p className="muted">
+          Repost from home, then navigate back to Ada. The mutation invalidates the feed and interaction tags, but it
+          deliberately does not update Ada&apos;s public user/header tags.
+        </p>
+      </header>
       <Suspense fallback={<HomeFeedSkeleton />}>
         <HomeFeed />
       </Suspense>

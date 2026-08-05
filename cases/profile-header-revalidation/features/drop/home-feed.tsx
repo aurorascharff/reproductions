@@ -6,13 +6,36 @@ export async function HomeFeed() {
 
   return (
     <section className="card" data-testid="home-feed">
+      <p className="eyebrow">private cached home feed</p>
       <h2>Home feed</h2>
       <p className="muted">
-        Feed recomputes: <strong>{feed.feedRecomputes}</strong> | Interaction recomputes:{' '}
-        <strong>{interaction.interactionRecomputes}</strong> | Mutations: <strong>{feed.mutationCount}</strong>
+        Repost invalidates <code>feed</code>, <code>user-drops-ada</code>, and <code>drop-interactions:ada</code>.
       </p>
+      <div className="metric-grid">
+        <p>
+          feed filled <strong>{feed.filledAt}</strong>
+        </p>
+        <p>
+          feed delay <strong>{feed.delayMs}ms</strong>
+        </p>
+        <p>
+          feed recomputes <strong>{feed.feedRecomputes}</strong>
+        </p>
+        <p>
+          interaction filled <strong>{interaction.filledAt}</strong>
+        </p>
+        <p>
+          interaction delay <strong>{interaction.delayMs}ms</strong>
+        </p>
+        <p>
+          interaction recomputes <strong>{interaction.interactionRecomputes}</strong>
+        </p>
+        <p>
+          mutations <strong>{feed.mutationCount}</strong>
+        </p>
+      </div>
       {feed.items.map(item => (
-        <article className="card" key={item.id}>
+        <article className="drop-card" key={item.id}>
           <div className="row">
             <div>
               <strong>@{item.authorHandle}</strong>
@@ -30,9 +53,22 @@ export async function HomeFeed() {
 export function HomeFeedSkeleton() {
   return (
     <section className="card" aria-label="Loading home feed">
-      <span className="skeleton" style={{ width: 120 }} />
-      <div style={{ height: 12 }} />
-      <span className="skeleton" style={{ width: '100%' }} />
+      <div className="stack">
+        <span className="skeleton" style={{ width: 92 }} />
+        <span className="skeleton" style={{ width: 128 }} />
+        <span className="skeleton" style={{ width: '90%' }} />
+      </div>
+      <div className="metric-grid">
+        <span className="skeleton" />
+        <span className="skeleton" />
+        <span className="skeleton" />
+      </div>
+      {Array.from({ length: 2 }).map((_, index) => (
+        <div className="drop-card" key={index}>
+          <span className="skeleton" style={{ width: 70 }} />
+          <span className="skeleton" style={{ width: '82%' }} />
+        </div>
+      ))}
     </section>
   );
 }

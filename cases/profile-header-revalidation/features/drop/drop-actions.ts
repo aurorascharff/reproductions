@@ -4,7 +4,7 @@ import { updateTag } from 'next/cache';
 import { resetReproStore, toggleAdaRepostInStore } from '../../lib/repro-store';
 
 export async function toggleAdaRepost() {
-  toggleAdaRepostInStore();
+  await toggleAdaRepostInStore();
 
   updateTag('feed');
   updateTag('user-drops-ada');
@@ -12,7 +12,7 @@ export async function toggleAdaRepost() {
 }
 
 export async function resetRepro() {
-  resetReproStore();
+  await resetReproStore();
 
   updateTag('feed');
   updateTag('user-drops-ada');

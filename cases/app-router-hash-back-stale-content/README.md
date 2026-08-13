@@ -8,6 +8,10 @@ The trigger is a native same-page fragment link followed by a Next.js route
 navigation. The case uses one statically generated dynamic route and no MDX,
 Cache Components, custom history handling, client layout, or Suspense boundary.
 
+## Live reproduction
+
+https://app-router-hash-back-stale-content.vercel.app/docs/alpha
+
 ## Run
 
 ```bash

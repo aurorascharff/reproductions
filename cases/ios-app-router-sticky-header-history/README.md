@@ -39,7 +39,17 @@ pnpm install
 pnpm dev
 ```
 
-Then open the printed network URL from an iOS device or Simulator.
+Open <http://localhost:3000/docs>. To test from an iOS device or Simulator,
+open the network URL printed by Next.js.
+
+## Live comparison
+
+- [With BFCache route retention (3 route trees)](https://ios-activity-header-with-bfcache.vercel.app/docs)
+- [Without inactive BFCache route retention (1 active route tree)](https://ios-activity-header-without-bfcache.vercel.app/docs)
+
+Both deployments have Cache Components enabled. The only intended difference
+is the maximum number of route trees retained by Next.js's in-memory BFCache.
+Open each URL in iOS Safari and repeat the edge-swipe steps above.
 
 ## Comparison
 
@@ -62,9 +72,6 @@ mounted in hidden Activity boundaries. In testing, this removed the flicker.
 The comparison mode temporarily patches Next.js's internal
 `bfcache-state-manager` before `next dev` or `next build`. It is diagnostic code,
 not a proposed application workaround.
-
-For two deployed comparisons, deploy the app once without
-`NEXT_ACTIVITY_RETENTION`, and once with `NEXT_ACTIVITY_RETENTION=1`.
 
 ## Notes
 

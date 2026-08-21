@@ -139,6 +139,13 @@ aside p {
   line-height: 1.7;
 }
 
+.retention {
+  border: 1px solid #c8d1dc;
+  border-radius: 6px;
+  background: #f5f7f9;
+  padding: 10px 12px;
+}
+
 @media (max-width: 680px) {
   .site-header {
     padding: 0 16px;

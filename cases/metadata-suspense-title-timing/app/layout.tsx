@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
+    <html lang="en">
+      <body>
         <TitleWatcher />
         {/* Suspense boundary wraps only the Navbar (matches user's repro). */}
         <Suspense fallback={<div data-testid="nav-fallback">Loading nav…</div>}>

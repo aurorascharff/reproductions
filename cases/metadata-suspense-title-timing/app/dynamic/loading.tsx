@@ -1,3 +1,3 @@
 export default function Loading() {
-  return <main className="p-8">Loading dynamic page…</main>;
+  return <main>Loading dynamic page…</main>;
 }

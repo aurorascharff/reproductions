@@ -1,30 +1,52 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+function titleNodes(nodes: NodeList) {
+  return Array.from(nodes).filter(
+    (node) =>
+      node.nodeName === "TITLE" ||
+      (node instanceof Element && node.querySelector("title")),
+  );
+}
 
 export default function TitleWatcher() {
-  const [log, setLog] = useState("Click the link to start timing");
+  const startedAt = useRef<number | undefined>(undefined);
+  const [log, setLog] = useState(["Click a link to start the title trace."]);
 
   useEffect(() => {
-    let clickStartedAt: number | undefined;
-    let titleAtClick = document.title;
-
     const onClick = (event: MouseEvent) => {
-      const link = (event.target as Element).closest('a[href="/dynamic"]');
+      const link = (event.target as Element).closest<HTMLAnchorElement>(
+        'a[href="/"], a[href="/dynamic"]',
+      );
       if (!link) return;
 
-      clickStartedAt = performance.now();
-      titleAtClick = document.title;
-      setLog(`0ms: click — ${titleAtClick}`);
+      startedAt.current = performance.now();
+      setLog([
+        `0ms: click ${link.pathname} — document.title = ${JSON.stringify(document.title)}`,
+      ]);
     };
 
-    const observer = new MutationObserver(() => {
-      if (clickStartedAt === undefined || document.title === titleAtClick) return;
+    const observer = new MutationObserver((records) => {
+      if (startedAt.current === undefined) return;
 
-      const elapsed = performance.now() - clickStartedAt;
-      setLog(
-        `0ms: click — ${titleAtClick} | ${elapsed.toFixed(0)}ms: title — ${document.title}`,
+      const changes = records.flatMap((record) => {
+        if (record.type === "characterData") return ["title text changed"];
+
+        return [
+          ...titleNodes(record.removedNodes).map(() => "title removed"),
+          ...titleNodes(record.addedNodes).map(() => "title inserted"),
+        ];
+      });
+
+      if (changes.length === 0) return;
+
+      const elapsed = performance.now() - startedAt.current;
+      const titleCount = document.head.querySelectorAll("title").length;
+      setLog((entries) =>
+        entries.concat(
+          `${elapsed.toFixed(1)}ms: ${changes.join(", ")} — document.title = ${JSON.stringify(document.title)}; <title> count = ${titleCount}`,
+        ),
       );
-      clickStartedAt = undefined;
     });
 
     document.addEventListener("click", onClick, true);
@@ -40,5 +62,5 @@ export default function TitleWatcher() {
     };
   }, []);
 
-  return <output aria-label="Title timing">{log}</output>;
+  return <output aria-label="Title timing">{log.join("\n")}</output>;
 }

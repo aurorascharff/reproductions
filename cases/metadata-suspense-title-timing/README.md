@@ -5,6 +5,8 @@ navigation between pages with static metadata. It also tests whether the new
 title is withheld while an unrelated `<Suspense>` boundary in the root layout
 is pending.
 
+**Live reproduction:** [metadata-suspense-title-timing.vercel.app](https://metadata-suspense-title-timing.vercel.app)
+
 ## Result: reproduced on `next@16.3.1`
 
 Next.js removes the old `<title>` before it inserts the new one. During that

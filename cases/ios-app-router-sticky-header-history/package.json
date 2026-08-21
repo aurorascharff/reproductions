@@ -1,0 +1,24 @@
+{
+  "name": "ios-app-router-sticky-header-history",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/configureActivityRetention.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/configureActivityRetention.mjs",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "16.3.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.34.3"
+}

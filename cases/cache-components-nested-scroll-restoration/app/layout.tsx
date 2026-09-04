@@ -14,10 +14,13 @@ export default function RootLayout({children}: {children: ReactNode}) {
       <body>
         <div className="app-shell">
           <header className="site-header">
-            <Link href="/" className="brand">
-              Nested scroll restoration
-            </Link>
-            <span>Next.js 16.3.1-canary.26 · Cache Components</span>
+            <strong>Nested scroll restoration</strong>
+            <nav>
+              <Link href="/">Home</Link>
+              <Link href="/library">Library</Link>
+              <Link href="/search">Search</Link>
+              <Link href="/favorites">Favorites</Link>
+            </nav>
           </header>
           <main className="route-viewport">{children}</main>
         </div>

@@ -38,6 +38,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/app-router-hash-back-stale-content`](./cases/app-router-hash-back-stale-content) | Browser Back restores a native fragment URL while App Router leaves the next dynamic route rendered | Extracted from the react.dev App Router migration |
 | [`cases/ios-app-router-sticky-header-history`](./cases/ios-app-router-sticky-header-history) | iOS Safari can flash a sticky blurred header when Cache Components restores an inactive route through React Activity | Extracted from the react.dev App Router migration |
 | [`cases/use-cache-empties-instant-error-stack`](./cases/use-cache-empties-instant-error-stack) | `use cache` + `generateStaticParams` + `partialPrefetching` → the `instant-shell-url-data` insight fires with an **empty Call Stack** (no user frame); removing `use cache` brings the `await params` frame back. `addErrorContext` isn't cache-aware unlike `applyOwnerStack`. Possibly #96028 | Authored for friction log |
+| [`cases/cache-components-nested-scroll-restoration`](./cases/cache-components-nested-scroll-restoration) | A route-owned nested scroller restores while Activity retains the route, but returns at the top after the three-route Cache Components retention window evicts it ([live](https://cache-components-nested-scroll-rest.vercel.app)) | Extracted from next-beats |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

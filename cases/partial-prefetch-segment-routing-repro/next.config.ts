@@ -3,7 +3,7 @@ import { withEve } from "eve/next";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
-  partialPrefetching: process.env.PARTIAL_PREFETCHING !== "false",
+  partialPrefetching: true,
 };
 
-export default withEve(nextConfig);
+export default process.env.WITH_EVE === "false" ? nextConfig : withEve(nextConfig);

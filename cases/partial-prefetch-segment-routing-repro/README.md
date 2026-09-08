@@ -13,12 +13,13 @@ then resolves to `/404` before Next's segment route is selected.
 
 - Broken, Partial Prefetching enabled:
   <https://ppf-eve-partial-prefetch-broken.vercel.app>
-- Working control, only Partial Prefetching disabled:
+- Working control, only Eve disabled:
   <https://partial-prefetch-segment-routing-re.vercel.app>
 
-Both deployments use Next.js 16.3.3, Cache Components, Eve 0.52.2, and the
-same two pages. The working control sets the `PARTIAL_PREFETCHING=false` build
-environment variable; the source defaults to the broken configuration.
+Both deployments use Next.js 16.3.3, Cache Components, Partial Prefetching,
+and the same two pages. The broken deployment uses Eve 0.52.2. The working
+control sets the `WITH_EVE=false` build environment variable so it exports the
+plain Next.js config; the source defaults to the broken Eve configuration.
 
 ## Reproduce in the browser
 
@@ -36,8 +37,8 @@ Next-Url: /
 ```
 
 That request returns `404` with `x-matched-path: /404`. The working control
-uses the pre-Partial-Prefetching RSC request instead; it returns `200` with
-`x-matched-path: /activity.rsc` and warms the client router cache.
+sends the same segment-prefetch request; it returns `200` and warms the client
+router cache.
 
 The broken response can also be checked directly:
 
@@ -77,6 +78,6 @@ route earlier in the generated route list also did not fix it. An app-level
 `proxy.ts` rewrite did not run because the deployment returned the static 404
 before Next middleware/proxy execution.
 
-The safe application workaround is to keep Cache Components enabled and leave
-Partial Prefetching disabled until the service-routing integration preserves
-Next's segment-prefetch handling.
+Disabling Eve makes the same deployed segment-prefetch request work. This keeps
+Partial Prefetching in both sides of the comparison and isolates Eve as the only
+meaningful variable.

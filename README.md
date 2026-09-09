@@ -39,6 +39,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/ios-app-router-sticky-header-history`](./cases/ios-app-router-sticky-header-history) | iOS Safari can flash a sticky blurred header when Cache Components restores an inactive route through React Activity | Extracted from the react.dev App Router migration |
 | [`cases/use-cache-empties-instant-error-stack`](./cases/use-cache-empties-instant-error-stack) | `use cache` + `generateStaticParams` + `partialPrefetching` → the `instant-shell-url-data` insight fires with an **empty Call Stack** (no user frame); removing `use cache` brings the `await params` frame back. `addErrorContext` isn't cache-aware unlike `applyOwnerStack`. Possibly #96028 | Authored for friction log |
 | [`cases/cache-components-nested-scroll-restoration`](./cases/cache-components-nested-scroll-restoration) | A route-owned nested scroller restores while Activity retains the route, but returns at the top after the three-route Cache Components retention window evicts it ([live](https://cache-components-nested-scroll-rest.vercel.app)) | Extracted from next-beats |
+| [`cases/instant-navigation-stage-lock`](./cases/instant-navigation-stage-lock) | A production `instant()` test exposes warm cached content below `unstable_navigation()` during a `prefetch={true}` navigation on a locally packed post-Canary 21 build | Extracted from the Partial Prefetching optimizer eval |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

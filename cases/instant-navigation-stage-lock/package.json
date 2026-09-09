@@ -1,0 +1,24 @@
+{
+  "name": "instant-navigation-stage-repro",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "file:./next.tgz",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@next/playwright": "16.4.0-canary.22",
+    "@playwright/test": "1.61.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.16.1"
+}

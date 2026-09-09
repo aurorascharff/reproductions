@@ -15,27 +15,21 @@ the related sessions should be excluded from both the App Shell and per-link
 prefetches. The existing framework test for a speculative runtime prefetch
 asserts the same behavior.
 
-## Expected behavior
+## Expected and actual behavior
 
 The production test uses `@next/playwright`'s `instant()` helper to pause after
 the prefetched UI is applied but before navigation-only work can commit. At that
-point it expects:
+point it compares the expected and actual prefetched UI:
 
-| Region                                                | During the `instant()` lock | After the lock |
-| ----------------------------------------------------- | --------------------------- | -------------- |
-| Cached summary                                        | Visible                     | Visible        |
-| Cached related sessions below `unstable_navigation()` | Fallback only               | Visible        |
-| Fresh live questions below `connection()`             | Fallback only               | Visible        |
+| Region                                                | Expected during the `instant()` lock | Actual during the `instant()` lock |
+| ----------------------------------------------------- | ------------------------------------ | ---------------------------------- |
+| Cached summary                                        | Visible                              | Visible                            |
+| Cached related sessions below `unstable_navigation()` | Absent; fallback visible             | **Visible**                        |
+| Fresh live questions below `connection()`             | Absent; fallback visible             | Not reached                        |
 
-## Failing behavior
-
-Only the navigation-only row is wrong. During the `instant()` lock:
-
-| Region                                                | Expected                 | Actual                   |
-| ----------------------------------------------------- | ------------------------ | ------------------------ |
-| Cached summary                                        | Visible                  | Visible                  |
-| Cached related sessions below `unstable_navigation()` | Absent; fallback visible | **Visible**              |
-| Fresh live questions below `connection()`             | Absent; fallback visible | Absent; fallback visible |
+Only the navigation-only row is wrong. After the lock is released, both
+deferred regions should render. The failing run does not reach those assertions
+because Playwright stops at the navigation-only failure.
 
 The test fails here because Playwright finds one `related-sessions` element
 instead of none:
@@ -47,8 +41,7 @@ await expect(page.getByTestId("related-sessions")).toHaveCount(0);
 The first `[setup]` test passes. It warms the reusable related-session **server
 cache** without warming the reproduction test's browser cache. The second
 `[reproduction]` test fails in its step named `FAILS: the navigation-only region
-is absent and its fallback is visible`. Playwright stops there, so later steps
-do not run in that attempt.
+is absent and its fallback is visible`.
 
 The navigation-stage placement matches the documented pattern:
 `unstable_navigation()` is awaited in the uncached component before resolving

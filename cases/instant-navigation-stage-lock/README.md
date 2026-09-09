@@ -15,6 +15,54 @@ the related sessions should be excluded from both the App Shell and per-link
 prefetches. The existing framework test for a speculative runtime prefetch
 asserts the same behavior.
 
+## Expected behavior
+
+The production test uses `@next/playwright`'s `instant()` helper to pause after
+the prefetched UI is applied but before navigation-only work can commit. At that
+point it expects:
+
+| Region                                                | During the `instant()` lock | After the lock |
+| ----------------------------------------------------- | --------------------------- | -------------- |
+| Cached summary                                        | Visible                     | Visible        |
+| Cached related sessions below `unstable_navigation()` | Fallback only               | Visible        |
+| Fresh live questions below `connection()`             | Fallback only               | Visible        |
+
+## Failing behavior
+
+Only the navigation-only row is wrong. During the `instant()` lock:
+
+| Region                                                | Expected                 | Actual                   |
+| ----------------------------------------------------- | ------------------------ | ------------------------ |
+| Cached summary                                        | Visible                  | Visible                  |
+| Cached related sessions below `unstable_navigation()` | Absent; fallback visible | **Visible**              |
+| Fresh live questions below `connection()`             | Absent; fallback visible | Absent; fallback visible |
+
+The test fails here because Playwright finds one `related-sessions` element
+instead of none:
+
+```ts
+await expect(page.getByTestId("related-sessions")).toHaveCount(0);
+```
+
+The first `[setup]` test passes. It warms the reusable related-session **server
+cache** without warming the reproduction test's browser cache. The second
+`[reproduction]` test fails in its step named `FAILS: the navigation-only region
+is absent and its fallback is visible`. Playwright stops there, so later steps
+do not run in that attempt.
+
+The navigation-stage placement matches the documented pattern:
+`unstable_navigation()` is awaited in the uncached component before resolving
+`params`, and the reusable lookup is in a separate `"use cache"` function below
+it.
+
+As a control, the same production test passes with the published
+`next@16.4.0-canary.21` package. It fails with the locally packed artifact from
+the updated optimizer branch, which narrows the discrepancy to newer framework
+changes rather than the fixture alone.
+
+This case intentionally keeps the expected assertion instead of weakening it
+to match the observed result.
+
 ## Reproduce
 
 ```bash
@@ -30,31 +78,3 @@ for the observed failure was built from `vercel/next.js#96471` after commit
 version `16.4.0-canary.20`, but contains newer navigation-stage changes. The
 tarball is intentionally ignored instead of checking a framework build into
 this repository.
-
-The production test uses `@next/playwright`'s `instant()` helper and expects:
-
-| Region | During the `instant()` lock | After the lock |
-| --- | --- | --- |
-| Cached summary | Visible | Visible |
-| Cached related sessions below `unstable_navigation()` | Fallback only | Visible |
-| Fresh live questions below `connection()` | Fallback only | Visible |
-
-## Observed
-
-The first test warms the reusable related-session cache in one browser context.
-The second test starts with a fresh browser context and performs the
-`prefetch={true}` navigation under `instant()`. The locked assertion fails
-because `related-sessions` is already visible.
-
-The navigation-stage placement matches the documented pattern:
-`unstable_navigation()` is awaited in the uncached component before resolving
-`params`, and the reusable lookup is in a separate `"use cache"` function below
-it.
-
-As a control, the same production test passes with the published
-`next@16.4.0-canary.21` package. It fails with the locally packed artifact from
-the updated optimizer branch, which narrows the discrepancy to newer framework
-changes rather than the fixture alone.
-
-This case intentionally keeps the expected assertion instead of weakening it
-to match the observed result.

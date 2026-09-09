@@ -1,6 +1,5 @@
 import { unstable_navigation } from 'next/cache'
 import { notFound } from 'next/navigation'
-import { connection } from 'next/server'
 import { Suspense } from 'react'
 
 type Params = Promise<{ slug: string }>
@@ -14,10 +13,6 @@ export default function SessionPage({ params }: { params: Params }) {
 
       <Suspense fallback={<p data-testid="related-fallback">Loading related sessions…</p>}>
         <RelatedSessions params={params} />
-      </Suspense>
-
-      <Suspense fallback={<p data-testid="live-fallback">Loading live questions…</p>}>
-        <LiveQuestions params={params} />
       </Suspense>
     </main>
   )
@@ -48,18 +43,6 @@ async function RelatedSessions({ params }: { params: Params }) {
       {sessions.map((session) => (
         <p key={session}>{session}</p>
       ))}
-    </section>
-  )
-}
-
-async function LiveQuestions({ params }: { params: Params }) {
-  await connection()
-  const { slug } = await params
-
-  return (
-    <section data-testid="live-questions">
-      <h2>Live audience questions</h2>
-      <p>What should teams try first after {slug}?</p>
     </section>
   )
 }

@@ -31,16 +31,10 @@ test.describe.serial("navigation-stage instant contract", () => {
         ).toHaveCount(0);
         await expect(page.getByTestId("related-fallback")).toBeVisible();
       });
-
-      await test.step("control: request-time content is absent and its fallback is visible", async () => {
-        await expect(page.getByTestId("live-questions")).toHaveCount(0);
-        await expect(page.getByTestId("live-fallback")).toBeVisible();
-      });
     });
 
-    await test.step("after the lock: deferred regions finish rendering", async () => {
+    await test.step("after the lock: the navigation-only region finishes rendering", async () => {
       await expect(page.getByTestId("related-sessions")).toBeVisible();
-      await expect(page.getByTestId("live-questions")).toBeVisible();
     });
   });
 });

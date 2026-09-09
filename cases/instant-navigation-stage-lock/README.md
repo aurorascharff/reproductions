@@ -7,8 +7,7 @@ The source page contains one `<Link prefetch={true}>`. Its destination renders:
 
 - a cached summary that should be included in the per-link prefetch;
 - cached related sessions below `await unstable_navigation()`, which should
-  wait for navigation; and
-- uncached live questions below `await connection()`, which should stay fresh.
+  wait for navigation.
 
 According to the [`unstable_navigation()` documentation](https://nextjs.org/docs/app/api-reference/functions/navigation),
 the related sessions should be excluded from both the App Shell and per-link
@@ -21,15 +20,15 @@ The production test uses `@next/playwright`'s `instant()` helper to pause after
 the prefetched UI is applied but before navigation-only work can commit. At that
 point it compares the expected and actual prefetched UI:
 
-| Region                                                | Expected during the `instant()` lock | Actual during the `instant()` lock |
-| ----------------------------------------------------- | ------------------------------------ | ---------------------------------- |
-| Cached summary                                        | Visible                              | Visible                            |
-| Cached related sessions below `unstable_navigation()` | Absent; fallback visible             | **Visible**                        |
-| Fresh live questions below `connection()`             | Absent; fallback visible             | Not reached                        |
+| Region                                                | Expected content during the `instant()` lock | Actual content during the `instant()` lock |
+| ----------------------------------------------------- | -------------------------------------------- | ------------------------------------------ |
+| Cached summary                                        | Visible                                      | Visible                                    |
+| Cached related sessions below `unstable_navigation()` | Absent                                       | **Visible**                                |
 
-Only the navigation-only row is wrong. After the lock is released, both
-deferred regions should render. The failing run does not reach those assertions
-because Playwright stops at the navigation-only failure.
+While the related sessions are absent, their Suspense fallback should be
+visible. After the lock is released, the related sessions should render. The
+failing run does not reach those assertions because Playwright stops when it
+finds the related sessions already visible during the lock.
 
 The test fails here because Playwright finds one `related-sessions` element
 instead of none:

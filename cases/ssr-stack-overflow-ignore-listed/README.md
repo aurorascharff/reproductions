@@ -10,9 +10,19 @@ pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The browser remains blank
-while the request runs, then receives an HTTP 500. The terminal prints output
-like:
+Open [http://localhost:3000](http://localhost:3000).
+
+## What we expected
+
+The development-server log should include at least one useful application,
+React, or Next.js frame identifying where the stack overflow started. For this
+fixture, an application frame should point back to the recursive component in
+`app/page.tsx`.
+
+## What you actually see
+
+The browser remains blank while the request runs, then receives an HTTP 500.
+The terminal prints output like:
 
 ```text
 RangeError: Maximum call stack size exceeded
@@ -23,6 +33,11 @@ TypeError: frame.join is not a function
     at ignore-listed frames
 ```
 
-The recursive Server Component intentionally overflows inside React's Flight
-rendering. The expected development log should retain at least one useful
-React, Next.js, or application frame identifying where the overflow started.
+The exact error digest and number of follow-up `TypeError` messages can vary.
+The bug is reproduced when the original `RangeError` has only
+`at ignore-listed frames`, with no frame pointing to `app/page.tsx`.
+
+The recursive component is only the minimal trigger. A plain recursive
+function does not reproduce this bug because its application frame remains in
+the stack. The missing-frame behavior occurs when the overflow happens inside
+React's server-render loop.

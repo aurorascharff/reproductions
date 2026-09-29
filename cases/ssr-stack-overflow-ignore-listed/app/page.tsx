@@ -1,6 +1,7 @@
 function Recursive() {
-  return <Recursive />
+  return <Recursive />;
 }
+
 export default function Page() {
-  return <Recursive />
+  return <Recursive />;
 }

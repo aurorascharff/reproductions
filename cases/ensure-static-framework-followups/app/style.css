@@ -1,0 +1,29 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: #ededed;
+  background: #0a0a0a;
+  font:
+    16px/1.5 Arial,
+    sans-serif;
+}
+
+main {
+  width: min(760px, calc(100% - 40px));
+  margin: 64px auto;
+}
+
+a {
+  color: #70b7ff;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+li + li {
+  margin-top: 16px;
+}

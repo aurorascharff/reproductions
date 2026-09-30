@@ -16,11 +16,11 @@ follow-up:
 
 | Route | Current behavior | Expected behavior |
 | --- | --- | --- |
-| `/browser-instant-false` | The render fails because `use(browser())` blocks the root. | `instant = false` should allow the browser-only render; it does not require a server resume. |
-| `/duplicate-client-io-error` | The overlay reports both `use(io())` and `connection()` as server holes. | It should report only `connection()`; `use(io())` is allowed in the Client Component behind Suspense. |
-| `/unused-client-promise` | The overlay says it is unable to provide a location. | The error should point to the request-dependent promise passed from `page.tsx`. |
-| `/short-lived-cache` | The overlay labels the cache as generic uncached/runtime data and recommends adding `"use cache"`, which is already present. | The guidance should say that `expire` must be at least five minutes. |
-| `/route-hints` | Provides `false`, `shell`, and `prefetch` links for inspecting static and runtime prefetch requests. | This is a behavior baseline for the route-hint cleanup, not a separate error. |
+| [Browser work with instant disabled](./app/browser-instant-false) | The render fails because `use(browser())` blocks the root. | `instant = false` should allow the browser-only render; it does not require a server resume. |
+| [Duplicate client IO error](./app/duplicate-client-io-error) | The overlay reports both `use(io())` and `connection()` as server holes. | It should report only `connection()`; `use(io())` is allowed in the Client Component behind Suspense. |
+| [Locationless unused promise](./app/unused-client-promise) | The overlay says it is unable to provide a location. | The error should point to the request-dependent promise passed from `page.tsx`. |
+| [Short-lived cache guidance](./app/short-lived-cache) | The overlay labels the cache as generic uncached/runtime data and recommends adding `"use cache"`, which is already present. | The guidance should say that `expire` must be at least five minutes. |
+| [Route-hint stage baseline](./app/route-hints) | Provides `false`, `shell`, and `prefetch` links for inspecting static and runtime prefetch requests. | This is a behavior baseline for the route-hint cleanup, not a separate error. |
 
 ## Route-hint baseline
 

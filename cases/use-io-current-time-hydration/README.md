@@ -1,19 +1,17 @@
-# `use(io())` current-time hydration mismatch
+# `use(io())` current-time hydration check
 
-Minimal reproduction for the Client Component pattern proposed in
+Minimal verification of the Client Component pattern proposed in
 [vercel/next.js#99677](https://github.com/vercel/next.js/pull/99677). The
 error page recommends calling `use(io())` before `Date.now()` in a Client
-Component. On a dynamic request, the server renders one value and the browser
-renders another during hydration.
+Component and wrapping it in `<Suspense>`.
 
 ## App shape
 
 - Next.js `16.5.0-canary.10`
 - `cacheComponents: true`
 - `partialPrefetching: true`
-- A Server Component calls `await connection()` inside `<Suspense>` so the
-  timestamp renders on each request
-- A nested Client Component calls `use(io())`, then renders `Date.now()`
+- A Client Component calls `use(io())`, then renders `Date.now()`
+- The parent Server Component wraps it in `<Suspense>`
 
 ## Run
 
@@ -28,16 +26,14 @@ console during a direct navigation.
 
 ## Expected result
 
-The production build succeeds, but a direct navigation reports a hydration
-mismatch. The development error shows the two values explicitly:
+The production build succeeds and a direct navigation does **not** report a
+hydration mismatch.
 
-```text
-Hydration failed because the server rendered text didn't match the client.
+During static prerendering, `io()` suspends and the nearest `<Suspense>`
+fallback is prerendered. The timestamp is not included in the prerendered HTML.
+In the browser, `io()` resolves immediately and the Client Component renders
+the current timestamp without comparing it with a server-rendered timestamp.
 
-+ 1791982169108
-- 1791982168993
-```
-
-The mismatch is deterministic because `Date.now()` has millisecond precision.
-The server includes the request-time value in the streamed HTML, then the
-Client Component recomputes the value in the browser.
+Adding `await connection()` changes this into a dynamic-request scenario. In
+that separate case, both the server and browser render `Date.now()`, which can
+produce a hydration mismatch. That is not the static-prerender case shown here.

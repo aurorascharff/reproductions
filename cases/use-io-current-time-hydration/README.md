@@ -1,18 +1,19 @@
-# `use(io())` current-time hydration check
+# `use(io())` current-time hydration mismatch
 
-Minimal app for checking the Client Component pattern proposed in
+Minimal reproduction for the Client Component pattern proposed in
 [vercel/next.js#99677](https://github.com/vercel/next.js/pull/99677). The
-component and its parent match the guide's **Suspend static prerendering with
-`use(io())`** example.
+error page recommends calling `use(io())` before `Date.now()` in a Client
+Component. On a dynamic request, the server renders one value and the browser
+renders another during hydration.
 
 ## App shape
 
 - Next.js `16.5.0-canary.10`
 - `cacheComponents: true`
 - `partialPrefetching: true`
-- A Client Component calls `use(io())`, then renders
-  `new Date().toLocaleString()`
-- A Server Component wraps it in `<Suspense>`
+- A Server Component calls `await connection()` inside `<Suspense>` so the
+  timestamp renders on each request
+- A nested Client Component calls `use(io())`, then renders `Date.now()`
 
 ## Run
 
@@ -23,13 +24,20 @@ pnpm start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) and inspect the browser
-console during a direct navigation or hard reload.
+console during a direct navigation.
 
-## Verified result
+## Expected result
 
-On 2026-10-14, the production build succeeded. The initial prerendered HTML
-contained the Suspense fallback, and the current time appeared in the browser.
-No hydration error or warning appeared across 15 hard reloads in Chrome.
+The production build succeeds, but a direct navigation reports a hydration
+mismatch. The development error shows the two values explicitly:
 
-This case preserves the exact guide pattern so the reported hydration behavior
-can be tested independently.
+```text
+Hydration failed because the server rendered text didn't match the client.
+
++ 1791982169108
+- 1791982168993
+```
+
+The mismatch is deterministic because `Date.now()` has millisecond precision.
+The server includes the request-time value in the streamed HTML, then the
+Client Component recomputes the value in the browser.

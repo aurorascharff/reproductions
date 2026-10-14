@@ -5,5 +5,5 @@ import { io } from 'next/cache'
 
 export function CurrentTime() {
   use(io())
-  return <time>{new Date().toLocaleString()}</time>
+  return <time>{Date.now()}</time>
 }

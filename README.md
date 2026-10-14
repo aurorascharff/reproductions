@@ -44,7 +44,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/ensure-static-instant-false-empty-prefetch`](./cases/ensure-static-instant-false-empty-prefetch) | `ensureStatic = 'shell'` + `instant = false` + a `cookies()` read without `<Suspense>` → the build passes, the static prefetch is served, but the navigation waits on the server (3 s) as if `ensureStatic` were not set | Found while testing the Keeping pages static guide (Next.js PR #99493) |
 | [`cases/use-search-params-suspense-false-positive`](./cases/use-search-params-suspense-false-positive) | Bun logs `CLIENT_HOOK_DYNAMIC` for `useSearchParams()` directly inside `<Suspense>`, still prerenders the route, and exits `0`; the identical Node build is clean | Extracted from agent feedback reports 42 and 43 |
 | [`cases/next-code-frame-unicode-panic`](./cases/next-code-frame-unicode-panic) | A long Persian source line makes `next-code-frame` slice through a UTF-8 character boundary and abort the dev server; reproduces with both Turbopack and webpack | Reproduced from Next.js issue #92641 |
-| [`cases/use-io-current-time-hydration`](./cases/use-io-current-time-hydration) | Exact PR #99677 `use(io())` current-time Client Component pattern; checks the reported direct-navigation hydration mismatch | Extracted from Next.js PR #99677 |
+| [`cases/use-io-current-time-hydration`](./cases/use-io-current-time-hydration) | PR #99677 `use(io())` + `Date.now()` in a request-rendered Client Component → deterministic hydration mismatch | Extracted from Next.js PR #99677 |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

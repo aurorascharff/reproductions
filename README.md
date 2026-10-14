@@ -45,6 +45,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/use-search-params-suspense-false-positive`](./cases/use-search-params-suspense-false-positive) | Bun logs `CLIENT_HOOK_DYNAMIC` for `useSearchParams()` directly inside `<Suspense>`, still prerenders the route, and exits `0`; the identical Node build is clean | Extracted from agent feedback reports 42 and 43 |
 | [`cases/next-code-frame-unicode-panic`](./cases/next-code-frame-unicode-panic) | A long Persian source line makes `next-code-frame` slice through a UTF-8 character boundary and abort the dev server; reproduces with both Turbopack and webpack | Reproduced from Next.js issue #92641 |
 | [`cases/use-io-current-time-hydration`](./cases/use-io-current-time-hydration) | PR #99677 `use(io())` + `Date.now()` in a request-rendered Client Component → deterministic hydration mismatch | Extracted from Next.js PR #99677 |
+| [`cases/date-hydration-matrix`](./cases/date-hydration-matrix) | Thirteen current-time variants comparing Client and Server Components, `io()`, `connection()`, Suspense, `instant = false`, build failures, and hydration mismatches | Extracted from Next.js PR #99677 |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

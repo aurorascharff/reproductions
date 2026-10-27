@@ -10,9 +10,9 @@ server data dependency.
 
 ## Routes
 
-Both routes export `instant = true`, generate a title from `params`, and render
-the same hydration-gated content. The only relevant difference is the marker
-placement.
+Both routes generate a title from `params` and render the same hydration-gated
+content. The only relevant difference is the marker placement. Cache Components
+validates both routes by default.
 
 | Route | `DynamicMetadataMarker` placement | Observed diagnostic |
 | --- | --- | --- |

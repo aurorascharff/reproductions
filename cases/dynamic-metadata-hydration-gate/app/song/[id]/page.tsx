@@ -2,8 +2,6 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import HydrationGate from "../../HydrationGate";
 
-export const instant = true;
-
 export async function generateMetadata({
   params,
 }: {

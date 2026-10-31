@@ -1,12 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   cacheComponents: true,
+  cacheMaxMemorySize: 0,
   partialPrefetching: true,
-  cacheHandlers: {
-    remote: require.resolve(
-      'next/dist/server/lib/cache-handlers/default.external'
-    ),
-  },
 }
 
 module.exports = nextConfig

@@ -1,6 +1,6 @@
 # Cached content after `io()` is omitted from a static prefetch
 
-Visual reproduction for [agent feedback finding 5688](https://next-maintainer-agent.vercel.tools/agent-feedback/5688), pinned to Next.js `16.5.0-canary.31`.
+Visual reproduction for [agent feedback finding 5688](https://next-maintainer-agent.vercel.tools/agent-feedback/5688), pinned to Next.js `16.5.0-canary.31`. `cacheMaxMemorySize: 0` keeps the four-second delay repeatable.
 
 The home page has three `<Link prefetch={true}>` links:
 

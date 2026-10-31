@@ -5,7 +5,7 @@ function delay(milliseconds) {
 }
 
 export async function getCachedData(kind) {
-  'use cache: remote'
+  'use cache'
   cacheLife({ stale: 300, revalidate: 60, expire: 300 })
 
   await delay(4000)

@@ -47,6 +47,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/use-io-current-time-hydration`](./cases/use-io-current-time-hydration) | PR #99677 `use(io())` + `Date.now()` in a request-rendered Client Component → deterministic hydration mismatch | Extracted from Next.js PR #99677 |
 | [`cases/date-hydration-matrix`](./cases/date-hydration-matrix) | Thirteen current-time variants comparing Client and Server Components, `io()`, `connection()`, Suspense, `instant = false`, build failures, and hydration mismatches | Extracted from Next.js PR #99677 |
 | [`cases/dynamic-metadata-hydration-gate`](./cases/dynamic-metadata-hydration-gate) | A `connection()` marker inside a client hydration gate does not clear the runtime-data `generateMetadata()` Blocking Route diagnostic; the same marker outside the gate does | Extracted from a Songbook Studio report |
+| [`cases/io-cached-prefetch-omission`](./cases/io-cached-prefetch-omission) | Cached content after `io()` is omitted from a full-link prefetch on an otherwise static route, while the same cache without `io()` is instant and `connection()` correctly waits for navigation | Extracted from agent feedback finding 5688 |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

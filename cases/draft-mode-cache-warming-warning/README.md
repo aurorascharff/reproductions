@@ -1,7 +1,7 @@
 # Draft Mode triggers a cache-warming warning for deterministic content
 
-With Cache Components and Partial Prefetching enabled, visiting a cached page in
-Draft Mode logs an unexpected cache miss. The cached function takes **no arguments**
+On Next.js 16.4.5, with Cache Components and Partial Prefetching enabled, visiting
+a cached page in Draft Mode logs an unexpected cache miss. The cached function takes **no arguments**
 and returns a constant string. There is no database, authentication service,
 network request, client component or test instrumentation.
 
@@ -62,3 +62,28 @@ PARTIAL_PREFETCHING=0 EXPECT_WARNING=0 npm run reproduce
 
 All three requests returned HTTP 200 with **zero warnings**. Restore the default
 build with `npm run build` before trying the reproduction again.
+
+## Latest canary comparison
+
+The same app was also tested on **16.5.0-canary.49** on November 13, 2026,
+with React 19.1.0 unchanged. The warning **does not reproduce** on this canary.
+
+| Next.js | Partial Prefetching | Draft off / on / off warning counts |
+| --- | --- | --- |
+| 16.4.5 | Enabled | 0 / 1 / 0 |
+| 16.4.5 | Disabled | 0 / 0 / 0 |
+| 16.5.0-canary.49 | Enabled | 0 / 0 / 0 |
+| 16.5.0-canary.49 | Disabled | 0 / 0 / 0 |
+
+Every request returned HTTP 200 with the expected content. Both versions used a
+Turbopack production build. The repository remains pinned to the affected 16.4.5
+version so the original problem is reproducible. To check the canary separately:
+
+```sh
+npm install next@16.5.0-canary.49
+npm run build
+EXPECT_WARNING=0 npm run reproduce
+```
+
+This verifies the behavior on those two versions; it does not identify the commit
+that changed it.

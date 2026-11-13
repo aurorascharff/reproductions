@@ -1,0 +1,19 @@
+{
+  "name": "third-party-new-date-missing-stack",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:full": "__NEXT_SHOW_IGNORE_LISTED=true next dev",
+    "build": "next build",
+    "build:debug": "next build --debug-prerender",
+    "build:debug:full": "__NEXT_SHOW_IGNORE_LISTED=true next build --debug-prerender",
+    "start": "next start"
+  },
+  "dependencies": {
+    "blocking-widget": "file:./blocking-widget-1.0.0.tgz",
+    "next": "16.4.0-canary.62",
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  }
+}

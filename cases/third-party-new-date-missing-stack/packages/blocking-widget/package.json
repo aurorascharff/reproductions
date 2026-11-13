@@ -1,0 +1,9 @@
+{
+  "name": "blocking-widget",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "peerDependencies": {
+    "react": "19.2.5"
+  }
+}

@@ -25,6 +25,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 
 | Folder | Description | Source |
 |--------|-------------|--------|
+| [`cases/third-party-new-date-missing-stack`](./cases/third-party-new-date-missing-stack) | A third-party Server Component calls `new Date()`; the full debug-prerender terminal stack names the dependency, but the dev overlay loses its frames, including when all frames are shown | Minimal mock dependency |
 | [`cases/draft-mode-cache-warming-warning`](./cases/draft-mode-cache-warming-warning) | Draft Mode logs an unexpected cache miss for a no-argument, constant cached function when Partial Prefetching is enabled | [Next.js #100680](https://github.com/vercel/next.js/issues/100680) |
 | [`cases/next-cookies-opaque-error`](./cases/next-cookies-opaque-error) | `cookies()` not awaited → opaque `TypeError` at runtime | Authored for friction log |
 | [`cases/04-04-2026`](./cases/04-04-2026) | App router demo: `/` → `/products/[id]`, `cacheComponents` | Mirrored from **[github.com/aurorascharff/04-04-2026](https://github.com/aurorascharff/04-04-2026)** |

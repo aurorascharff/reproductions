@@ -1,0 +1,50 @@
+
+> third-party-new-date-missing-stack@0.1.0 build:debug:full
+> __NEXT_SHOW_IGNORE_LISTED=true next build --debug-prerender
+
+⚠ Prerendering is running in debug mode with NODE_ENV='development'. This will affect performance and should not be used for production.
+▲ Next.js 16.4.0-canary.62 (Turbopack)
+✓ Running next.config.mjs took 10ms
+- Cache Components enabled
+- Experiments (use with caution):
+  ✓ allowDevelopmentBuild (enabled by `--debug-prerender`)
+  ⨯ prerenderEarlyExit (disabled by `--debug-prerender`)
+  ✓ serverSourceMaps (enabled by `--debug-prerender`)
+  ⨯ turbopackMinify (disabled by `--debug-prerender`)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 264ms
+  Running TypeScript ...
+  Finished TypeScript in 1ms ...
+  Collecting page data using 4 workers ...
+  Generating static pages using 4 workers (0/3) ...
+Error: Route "/": Next.js encountered the unstable value `new Date()` while prerendering.
+
+This value can change between renders, so it must be either prerendered or computed later.
+
+Ways to fix this:
+  - [dynamic] Render at request time by adding a dynamic data access (e.g. `await connection()`) before this call
+  - [cache] Prerender and cache the value with `"use cache"`
+  - [client] Render the value on the client with `"use client"`
+  - [measure] If the value is for telemetry, use a timing API such as `performance.now()`
+
+Learn more: https://nextjs.org/docs/messages/blocking-prerender-current-time
+    at createSyncIOErrorImpl (node_modules/next/src/server/app-render/sync-io-messages.ts:33:10)
+    at createSyncIOError (node_modules/next/src/server/app-render/sync-io-messages.ts:50:10)
+    at io (node_modules/next/src/server/node-environment-extensions/io-utils.tsx:34:44)
+    at new Date (node_modules/next/src/server/node-environment-extensions/date.tsx:38:11)
+    at readCurrentTime (node_modules/blocking-widget/index.js:4:10)
+    at BlockingWidget (node_modules/blocking-widget/index.js:8:44)
+    at Page (app/page.jsx:7:7)
+   5 |     <main>
+   6 |       <h1>Third-party new Date() missing stack</h1>
+>  7 |       <BlockingWidget />
+     |       ^
+   8 |     </main>
+   9 |   )
+  10 | }
+To debug the issue, start the app in development mode by running `next dev`, then open "/" in your browser to investigate the error.
+Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
+
+> Export encountered errors on 1 path:
+	/page: /

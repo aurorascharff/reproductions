@@ -1,0 +1,30 @@
+Dev overlay: all 14 call-stack frames after expanding "Show 13 ignore-listed frame(s)".
+
+Page
+  app/page.jsx (7:7)
+resolveErrorDev
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (3428:51)
+getOutlinedModel
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (2614:22)
+parseModelString
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (2824:15)
+reviveModel
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (4794:13)
+reviveModel
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (4799:22)
+reviveModel
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (4881:32)
+parseModel
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (4789:14)
+initializeModelChunk
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (1949:21)
+resolveModelChunk
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (1779:12)
+processFullStringRow
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (4679:19)
+processFullBinaryRow
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (4542:7)
+processBinaryChunk
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (4760:19)
+progress
+  node_modules/next/dist/compiled/react-server-dom-turbopack/cjs/react-server-dom-turbopack-client.browser.development.js (5089:9)

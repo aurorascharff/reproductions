@@ -37,3 +37,13 @@ failure visible instead of waiting for Playwright to tear down the browser.
 
 The links already use `prefetch={true}`, and the category subtree has a
 category-dependent Suspense key.
+
+## Related fix
+
+[Next.js PR #98634](https://github.com/vercel/next.js/pull/98634) addresses the
+same deferred-render deadlock. Its layout-router patch passes the query-navigation
+regression in production and development. The regression also checks repeated
+query changes, retained input state, and dynamic content after unlocking.
+
+This reproduction stays pinned to an affected published version. The fix is not
+included in its dependencies.

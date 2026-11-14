@@ -1,0 +1,19 @@
+{
+  "name": "instant-query-navigation-repro",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "start": "next start --port 3424",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "next": "16.5.0-canary.48",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@next/playwright": "16.5.0-canary.48",
+    "@playwright/test": "1.61.0"
+  }
+}

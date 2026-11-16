@@ -1,0 +1,21 @@
+{
+  "name": "non-ascii-redirect-sources",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "dev:webpack": "next dev --webpack --hostname 127.0.0.1",
+    "build": "next build",
+    "build:webpack": "next build --webpack",
+    "start": "next start --hostname 127.0.0.1",
+    "probe": "node scripts/probe.mjs"
+  },
+  "dependencies": {
+    "next": "16.5.0-canary.51",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "playwright": "1.61.0"
+  }
+}

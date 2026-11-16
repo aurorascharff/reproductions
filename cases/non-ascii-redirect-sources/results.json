@@ -1,0 +1,785 @@
+{
+  "verified": "2026-11-16",
+  "next": "16.5.0-canary.51",
+  "react": "19.3.1",
+  "reactDOM": "19.3.1",
+  "results": [
+    {
+      "mode": "dev-turbo",
+      "observations": [
+        {
+          "baseURL": "http://127.0.0.1:3148",
+          "node": "v26.13.1"
+        },
+        {
+          "client": "curl",
+          "input": "/über/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/uber/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/über-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/target/",
+          "status": 200,
+          "location": null
+        },
+        {
+          "browser": "149.0.7827.55"
+        },
+        {
+          "client": "chromium",
+          "input": "/über/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/uber/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/uber/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/über-encoded/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber-encoded/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/target/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        }
+      ]
+    },
+    {
+      "mode": "dev-webpack",
+      "observations": [
+        {
+          "baseURL": "http://127.0.0.1:3148",
+          "node": "v26.13.1"
+        },
+        {
+          "client": "curl",
+          "input": "/über/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/uber/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/über-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/target/",
+          "status": 200,
+          "location": null
+        },
+        {
+          "browser": "149.0.7827.55"
+        },
+        {
+          "client": "chromium",
+          "input": "/über/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/uber/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/uber/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/über-encoded/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber-encoded/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/target/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        }
+      ]
+    },
+    {
+      "mode": "prod-turbo",
+      "observations": [
+        {
+          "baseURL": "http://127.0.0.1:3148",
+          "node": "v26.13.1"
+        },
+        {
+          "client": "curl",
+          "input": "/über/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/uber/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/über-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/target/",
+          "status": 200,
+          "location": null
+        },
+        {
+          "browser": "149.0.7827.55"
+        },
+        {
+          "client": "chromium",
+          "input": "/über/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/uber/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/uber/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/über-encoded/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber-encoded/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/target/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        }
+      ]
+    },
+    {
+      "mode": "prod-webpack",
+      "observations": [
+        {
+          "baseURL": "http://127.0.0.1:3148",
+          "node": "v26.13.1"
+        },
+        {
+          "client": "curl",
+          "input": "/über/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/uber/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/über-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/target/",
+          "status": 200,
+          "location": null
+        },
+        {
+          "browser": "149.0.7827.55"
+        },
+        {
+          "client": "chromium",
+          "input": "/über/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/uber/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/uber/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/über-encoded/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber-encoded/example/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/target/",
+          "network": [
+            {
+              "url": "http://127.0.0.1:3148/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "http://127.0.0.1:3148/target/"
+        }
+      ]
+    },
+    {
+      "mode": "vercel",
+      "observations": [
+        {
+          "baseURL": "https://non-ascii-redirect-sources.vercel.app",
+          "node": "v26.13.1"
+        },
+        {
+          "client": "curl",
+          "input": "/über/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl",
+          "input": "/uber/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/über-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/%C3%BCber-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl",
+          "input": "/target/",
+          "status": 200,
+          "location": null
+        },
+        {
+          "browser": "149.0.7827.55"
+        },
+        {
+          "client": "chromium",
+          "input": "/über/example/",
+          "network": [
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "https://non-ascii-redirect-sources.vercel.app/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber/example/",
+          "network": [
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/%C3%BCber/example/",
+              "status": 404,
+              "location": null
+            }
+          ],
+          "finalURL": "https://non-ascii-redirect-sources.vercel.app/%C3%BCber/example/"
+        },
+        {
+          "client": "chromium",
+          "input": "/uber/example/",
+          "network": [
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/uber/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "https://non-ascii-redirect-sources.vercel.app/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/über-encoded/example/",
+          "network": [
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "https://non-ascii-redirect-sources.vercel.app/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/%C3%BCber-encoded/example/",
+          "network": [
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/%C3%BCber-encoded/example/",
+              "status": 301,
+              "location": "/target/"
+            },
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "https://non-ascii-redirect-sources.vercel.app/target/"
+        },
+        {
+          "client": "chromium",
+          "input": "/target/",
+          "network": [
+            {
+              "url": "https://non-ascii-redirect-sources.vercel.app/target/",
+              "status": 200,
+              "location": null
+            }
+          ],
+          "finalURL": "https://non-ascii-redirect-sources.vercel.app/target/"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Normal curl and Chromium URL inputs are automatically percent-encoded.",
+    "The rawTargetComparisons use curl --http1.1 --request-target to send explicit request targets."
+  ],
+  "rawTargetComparisons": [
+    {
+      "environment": "local-webpack-production",
+      "observations": [
+        {
+          "baseURL": "http://127.0.0.1:3148",
+          "node": "v26.13.1"
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/über/example/",
+          "status": 400,
+          "location": null
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/%C3%BCber/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/uber/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/über-encoded/example/",
+          "status": 400,
+          "location": null
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/%C3%BCber-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/target/",
+          "status": 200,
+          "location": null
+        }
+      ]
+    },
+    {
+      "environment": "vercel-production",
+      "observations": [
+        {
+          "baseURL": "https://non-ascii-redirect-sources.vercel.app",
+          "node": "v26.13.1"
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/über/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/%C3%BCber/example/",
+          "status": 404,
+          "location": null
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/uber/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/über-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/%C3%BCber-encoded/example/",
+          "status": 301,
+          "location": "/target/"
+        },
+        {
+          "client": "curl-raw-request-target",
+          "input": "/target/",
+          "status": 200,
+          "location": null
+        }
+      ]
+    }
+  ],
+  "curl": "8.7.1",
+  "curlWireObservation": {
+    "input": "/über/example/",
+    "requestLine": "GET /%c3%bcber/example/ HTTP/2",
+    "method": "curl --path-as-is --trace against the Vercel production URL"
+  }
+}

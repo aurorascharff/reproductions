@@ -51,6 +51,7 @@ If [github.com/aurorascharff/reproductions](https://github.com/aurorascharff/rep
 | [`cases/date-hydration-matrix`](./cases/date-hydration-matrix) | Thirteen current-time variants comparing Client and Server Components, `io()`, `connection()`, Suspense, `instant = false`, build failures, and hydration mismatches | Extracted from Next.js PR #99677 |
 | [`cases/dynamic-metadata-hydration-gate`](./cases/dynamic-metadata-hydration-gate) | A `connection()` marker inside a client hydration gate does not clear the runtime-data `generateMetadata()` Blocking Route diagnostic; the same marker outside the gate does | Extracted from a Songbook Studio report |
 | [`cases/io-cached-prefetch-omission`](./cases/io-cached-prefetch-omission) | Cached content after `io()` is omitted from a full-link prefetch on an otherwise static route, while the same cache without `io()` is instant and `connection()` correctly waits for navigation | Extracted from agent feedback finding 5688 |
+| [`cases/non-ascii-redirect-sources`](./cases/non-ascii-redirect-sources) | Compare literal Unicode, ASCII, and encoded redirect sources with curl and browser requests, locally and on Vercel | [Next.js #33470](https://github.com/vercel/next.js/issues/33470), [docs PR #101845](https://github.com/vercel/next.js/pull/101845) |
 
 Shared assets for READMEs (e.g. screenshots) may live in [`docs/`](./docs/).
 

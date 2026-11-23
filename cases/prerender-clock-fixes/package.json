@@ -1,0 +1,13 @@
+{
+  "name": "prerender-clock-fixes",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "build": "next build", "start": "next start", "verify": "node scripts/verify.mjs" },
+  "dependencies": {
+    "clock-reader": "file:./clock-reader-1.0.0.tgz",
+    "next": "16.4.6",
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  },
+  "devDependencies": { "playwright": "1.56.1" }
+}

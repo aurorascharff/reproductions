@@ -1,0 +1,23 @@
+{
+  "name": "playwright-route-hides-dev-blocking-route",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "reproduce": "node run.mjs",
+    "reproduce:mcp": "node mcp.mjs",
+    "postinstall": "playwright install chromium"
+  },
+  "dependencies": {
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "playwright": "1.65.1",
+    "typescript": "^5"
+  }
+}

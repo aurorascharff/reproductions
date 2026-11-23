@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import http from 'node:http'
+import { brotliDecompressSync, unzipSync } from 'node:zlib'
 import * as fs from 'node:fs/promises'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
@@ -82,7 +83,13 @@ function observePrefetches() {
       if(path.startsWith('/session-') && ['2','3'].includes(req.headers['next-router-prefetch'])) {
         const chunks=[]
         incoming.on('data',b=>chunks.push(b))
-        incoming.on('end',()=>prefetches.push({path,status:incoming.statusCode,body:Buffer.concat(chunks).toString('utf8')}))
+        incoming.on('end',()=>{
+          const bytes=Buffer.concat(chunks)
+          const encoding=incoming.headers['content-encoding']
+          const decoded=encoding==='br' ? brotliDecompressSync(bytes) :
+            encoding==='gzip'||encoding==='deflate' ? unzipSync(bytes) : bytes
+          prefetches.push({path,status:incoming.statusCode,body:decoded.toString('utf8')})
+        })
       }
       res.writeHead(incoming.statusCode,incoming.headers)
       incoming.pipe(res)

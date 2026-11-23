@@ -1,0 +1,39 @@
+name: Prerender clock reproductions
+on:
+  push:
+    paths:
+      - 'cases/prerender-clock-fixes/**'
+      - '.github/workflows/prerender-clock.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    name: Clock / ${{ matrix.suite }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [diagnostic, clock-controls, other-controls, production]
+    defaults:
+      run:
+        working-directory: cases/prerender-clock-fixes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --no-audit --no-fund
+      - if: matrix.suite == 'production'
+        run: npx playwright install --with-deps chromium
+      - run: npm run verify -- "${{ matrix.suite }}"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clock-${{ matrix.suite }}
+          path: cases/prerender-clock-fixes/verification-logs/
+          if-no-files-found: ignore
+          retention-days: 7

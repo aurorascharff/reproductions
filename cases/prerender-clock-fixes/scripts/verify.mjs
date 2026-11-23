@@ -10,7 +10,7 @@ process.chdir(fileURLToPath(new URL('../', import.meta.url)))
 const logs = 'verification-logs'
 await fs.mkdir(logs, { recursive: true })
 const mode = process.argv[2]
-const env = { ...process.env, NEXT_TELEMETRY_DISABLED: '1', NO_COLOR: '1' }
+const env = { ...process.env, TZ: 'UTC', NEXT_TELEMETRY_DISABLED: '1', NO_COLOR: '1' }
 delete env.__NEXT_SHOW_IGNORE_LISTED
 assert(!(await fs.lstat('node_modules/clock-reader')).isSymbolicLink(), 'Install the dependency as a real package with npm ci')
 
@@ -81,10 +81,26 @@ async function proof(browser,server){
   }
   assert.match(await fs.readFile('.next/server/app/telemetry.html','utf8'),/Static result:/)
   assert.match(await fs.readFile(logs+'/fixed-build.txt','utf8'),/elapsed-ms: [\d.]+/)
+  function otherValues(markup, scope) {
+    const match=markup.match(new RegExp('<output id="'+scope+'-values">([^<]+)</output>'))
+    assert(match, scope+' values missing from HTML')
+    const [date, random, uuid]=match[1].split('|')
+    assert(Number.isFinite(Date.parse(date)))
+    assert(Number(random)>=0 && Number(random)<1 && random!=='')
+    assert.match(uuid,/^[0-9a-f-]{36}$/i)
+    return {random,uuid}
+  }
+  const valuesShell=await fs.readFile('.next/server/app/other-values.html','utf8')
+  const first=await html('other-values'), second=await html('other-values')
+  assert.doesNotMatch(valuesShell,/<output id="request-values">/)
+  assert.deepEqual(otherValues(first,'cached'),otherValues(valuesShell,'cached'))
+  assert.deepEqual(otherValues(second,'cached'),otherValues(valuesShell,'cached'))
+  assert.notEqual(otherValues(first,'request').uuid,otherValues(second,'request').uuid)
+  console.log('PASS Date(), Math.random(), and crypto.randomUUID() in cached and request-time output')
   const browserTime=Date.UTC(2040,0,1)
   const hydration=/hydration|hydrating|Minified React error #(?:418|423|425)/i
-  for (const route of ['browser','widget','supplied','client-boundary','mismatch']) {
-    const context=await browser.newContext()
+  for (const route of ['browser','widget','supplied','client-boundary','client-io','mismatch','timezone','timezone-fixed']) {
+    const context=await browser.newContext({timezoneId:'America/Los_Angeles'})
     const page=await context.newPage()
     const errors=[]
     page.on('pageerror',e=>errors.push(e.message))
@@ -104,17 +120,28 @@ async function proof(browser,server){
     } else if(route==='supplied') {
       assert.notEqual(stamp(serverHtml),browserTime)
       assert.equal(await page.locator('#supplied').textContent(),String(stamp(serverHtml)))
+    } else if(route==='timezone'||route==='timezone-fixed') {
+      assert.match(serverHtml,/<time id="date-label">1\/1\/2030<\/time>/)
+      if(route==='timezone')await until(()=>errors.some(e=>hydration.test(e)),'Missing time-zone mismatch')
+      assert.equal(await page.locator('#date-label').textContent(),route==='timezone'?'12/31/2029':'1/1/2030')
     } else if(route==='client-boundary') {
       assert.match(await fs.readFile('.next/server/app/client-boundary.html','utf8'),/Loading calendar/)
       await page.locator('[data-client-clock]').waitFor()
-      // A green build is the reported outcome. Capture hydration independently.
+      assert.equal(await page.locator('[data-client-clock]').textContent(),String(browserTime))
+    } else if(route==='client-io') {
+      assert.match(serverHtml,/<p>Waiting for client clock<\/p>/)
+      assert.doesNotMatch(serverHtml,/<time[^>]+data-stamp=/)
+      assert.equal(await page.locator('#mismatch').textContent(),String(browserTime))
     } else {
       assert.notEqual(stamp(serverHtml),browserTime)
       await until(()=>errors.some(e=>hydration.test(e)),'Missing positive control for a hydration mismatch')
       assert.equal(await page.locator('#mismatch').textContent(),String(browserTime))
     }
     await page.waitForLoadState('networkidle')
-    if(!['mismatch','client-boundary'].includes(route))assert.deepEqual(errors,[],route)
+    if(['mismatch','timezone'].includes(route)) {
+      assert(errors.some(e=>/Minified React error #418/.test(e)),route+': expected React hydration error #418')
+      assert.deepEqual(errors.filter(e=>!hydration.test(e)),[],route)
+    } else assert.deepEqual(errors,[],route)
     console.log('PASS browser:',route,'hydration diagnostics:',errors.filter(e=>hydration.test(e)).length)
     await context.close()
   }
@@ -123,11 +150,18 @@ async function proof(browser,server){
     await context.addCookies([{name:'visitor',value:'cookie-fixture',url:origin}])
     const page=await context.newPage();const before=server.output().length
     await page.goto(origin+'/prefetch')
-    const prefetch=page.waitForResponse(r=>new URL(r.url()).pathname==='/session-'+mode && r.request().headers()['rsc']==='1',{timeout:30000})
+    // A route-tree discovery response alone does not prove runtime prefetching.
+    const isRuntime=r=>new URL(r.url()).pathname==='/session-'+mode &&
+      ['2','3'].includes(r.request().headers()['next-router-prefetch'])
+    const responses=[]
+    page.on('response',r=>{if(isRuntime(r))responses.push(r)})
+    const prefetch=page.waitForResponse(isRuntime,{timeout:30000})
     await page.getByRole('button',{name:mode,exact:true}).click()
-    const response=await prefetch;assert.equal(response.status(),200)
-    const payload=await response.text()
-    assert(!payload.includes('cookie-fixture:header-fixture'),'Fresh result leaked into runtime prefetch')
+    await prefetch
+    await page.waitForLoadState('networkidle')
+    const payloads=await Promise.all(responses.map(async r=>{assert.equal(r.status(),200);return r.text()}))
+    assert(payloads.some(p=>p.includes('Session '+mode)),'Runtime prefetch did not return the session shell')
+    assert(payloads.every(p=>!p.includes('"id":"session"')),'Fresh result leaked into runtime prefetch')
     const diagnostic=()=>server.output().slice(before).split('\n').some(l=>l.includes('Route "/session-'+mode+'"')&&l.includes('Date.now()'))
     if(mode==='control')await until(diagnostic,'Missing runtime prerender diagnostic for unguarded read')
     await page.getByRole('link',{name:'Open session'}).click()
@@ -152,7 +186,7 @@ async function production() {
   } finally {await browser?.close(); proc.kill('SIGTERM'); await done; await fs.writeFile(logs+'/server.txt',serverLog)}
 }
 if(mode==='diagnostic')await diagnostic()
-else if(mode==='clock-controls')await controls([['suspense-only',/Date\.now\(\)/],['instant-false',/new Date\(\)/],['client',/in a Client Component/]])
+else if(mode==='clock-controls')await controls([['suspense-only',/Date\.now\(\)/],['io-unbounded',/outside (?:of )?.{0,12}Suspense|without (?:a |an? enclosing )?.{0,12}Suspense/i],['instant-false',/new Date\(\)/],['client',/in a Client Component/]])
 else if(mode==='other-controls')await controls([['random',/Math\.random\(\)/],['crypto',/randomUUID\(\)/]])
 else if(mode==='production')await production()
 else throw Error('Choose diagnostic, clock-controls, other-controls, or production')

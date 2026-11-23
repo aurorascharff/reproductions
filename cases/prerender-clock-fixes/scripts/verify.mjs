@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
+import http from 'node:http'
 import * as fs from 'node:fs/promises'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
@@ -69,6 +70,27 @@ async function until(fn, message, timeout=25000) {
 const stamp = html => {const m=html.match(/<[^>]+data-stamp="(\d+)"/); assert(m,'No clock in actual HTML');return Number(m[1])}
 async function html(route) {
   const res=await fetch(origin+'/'+route);assert.equal(res.status,200,route);return res.text()
+}
+// Observe the origin's streamed bytes. Chromium may discard an RSC response
+// after Next consumes the useful records, making Playwright response.text()
+// unavailable even though the server returned it to the real browser.
+function observePrefetches() {
+  const prefetches=[]
+  const proxy=http.createServer((req,res)=>{
+    const upstream=http.request({hostname:'127.0.0.1',port:3138,path:req.url,method:req.method,headers:req.headers},incoming=>{
+      const path=new URL(req.url,origin).pathname
+      if(path.startsWith('/session-') && ['2','3'].includes(req.headers['next-router-prefetch'])) {
+        const chunks=[]
+        incoming.on('data',b=>chunks.push(b))
+        incoming.on('end',()=>prefetches.push({path,status:incoming.statusCode,body:Buffer.concat(chunks).toString('utf8')}))
+      }
+      res.writeHead(incoming.statusCode,incoming.headers)
+      incoming.pipe(res)
+    })
+    upstream.on('error',()=>{if(!res.headersSent)res.writeHead(502);res.end()})
+    req.pipe(upstream)
+  })
+  return {proxy,prefetches}
 }
 async function proof(browser,server){
   for (const route of ['io','connection','cache','supplied']) {
@@ -153,15 +175,16 @@ async function proof(browser,server){
     // A route-tree discovery response alone does not prove runtime prefetching.
     const isRuntime=r=>new URL(r.url()).pathname==='/session-'+mode &&
       ['2','3'].includes(r.request().headers()['next-router-prefetch'])
-    const responses=[]
-    page.on('response',r=>{if(isRuntime(r))responses.push(r)})
     const prefetch=page.waitForResponse(isRuntime,{timeout:30000})
     await page.getByRole('button',{name:mode,exact:true}).click()
-    await prefetch
+    assert.equal((await prefetch).status(),200)
     await page.waitForLoadState('networkidle')
-    const payloads=await Promise.all(responses.map(async r=>{assert.equal(r.status(),200);return r.text()}))
-    assert(payloads.some(p=>p.includes('Session '+mode)),'Runtime prefetch did not return the session shell')
-    assert(payloads.every(p=>!p.includes('"id":"session"')),'Fresh result leaked into runtime prefetch')
+    const captures=()=>server.prefetches.filter(r=>r.path==='/session-'+mode)
+    await until(()=>captures().some(r=>r.body.includes('Session '+mode)),'Runtime prefetch did not return the session shell')
+    for(const {status,body} of captures()) {
+      assert.equal(status,200)
+      assert(!body.includes('"id":"session"'),'Fresh result leaked into runtime prefetch')
+    }
     const diagnostic=()=>server.output().slice(before).split('\n').some(l=>l.includes('Route "/session-'+mode+'"')&&l.includes('Date.now()'))
     if(mode==='control')await until(diagnostic,'Missing runtime prerender diagnostic for unguarded read')
     await page.getByRole('link',{name:'Open session'}).click()
@@ -176,14 +199,21 @@ async function production() {
   const {code,output}=await build('fixed-build')
   assert.equal(code,0,output.slice(-2400))
   // Start Next directly so SIGTERM always targets the server, not an npm wrapper.
-  const proc=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--port','3137'],{env,stdio:['ignore','pipe','pipe']})
+  const proc=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--port','3138'],{env,stdio:['ignore','pipe','pipe']})
   let serverLog='';for(const stream of [proc.stdout,proc.stderr])stream.on('data',b=>{serverLog+=b})
   const done=once(proc,'close');let browser
+  const {proxy,prefetches}=observePrefetches()
   try {
+    proxy.listen(3137,'127.0.0.1');await once(proxy,'listening')
     await until(async()=>{try{return (await fetch(origin)).ok}catch{return false}},'Production server did not start')
     browser=await chromium.launch()
-    await proof(browser,{output:()=>serverLog})
-  } finally {await browser?.close(); proc.kill('SIGTERM'); await done; await fs.writeFile(logs+'/server.txt',serverLog)}
+    await proof(browser,{output:()=>serverLog,prefetches})
+  } finally {
+    await browser?.close(); proxy.close(); proxy.closeAllConnections()
+    proc.kill('SIGTERM'); await done
+    await fs.writeFile(logs+'/server.txt',serverLog)
+    await fs.writeFile(logs+'/runtime-prefetches.json',JSON.stringify(prefetches,null,2))
+  }
 }
 if(mode==='diagnostic')await diagnostic()
 else if(mode==='clock-controls')await controls([['suspense-only',/Date\.now\(\)/],['io-unbounded',/outside (?:of )?.{0,12}Suspense|without (?:a |an? enclosing )?.{0,12}Suspense/i],['instant-false',/new Date\(\)/],['client',/in a Client Component/]])

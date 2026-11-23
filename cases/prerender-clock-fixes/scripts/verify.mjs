@@ -44,23 +44,35 @@ async function controls(names) {
     }
   } finally { await fs.rm('app/probe', {recursive:true}) }
 }
-async function diagnostic(){
+async function diagnostic() {
+  const cases = [
+    ['dependency', 'Date.now()', 'readClock'],
+    ['dependency-random', 'Math.random()', 'readRandom'],
+    ['dependency-crypto', 'crypto.randomUUID()', 'readUUID'],
+  ]
   await fs.mkdir('app/probe')
   try {
-    await fs.copyFile('controls/dependency.jsx','app/probe/page.jsx')
-    for (const [label,flags,vars] of [
-      ['default',[],{}], ['debug',['--debug-prerender'],{}],
-      ['debug-full',['--debug-prerender'],{__NEXT_SHOW_IGNORE_LISTED:'true'}]
-    ]) {
-      const {code,output}=await build(label,flags,vars)
-      assert.notEqual(code,0)
-      assert.match(output,/Route "\/probe".*Date\.now\(\)/)
-      if (label==='debug-full') {
-        assert.match(output,/at .*readClock[^\n]*node_modules\/clock-reader\/index\.js/)
-        assert.match(output,/at .*Page[^\n]*app\/probe\/page\.jsx/)
+    for (const [fixture, api, helper] of cases) {
+      await fs.copyFile('controls/' + fixture + '.jsx', 'app/probe/page.jsx')
+      for (const [mode, flags, vars] of [
+        ['default', [], {}],
+        ['debug', ['--debug-prerender'], {}],
+        ['debug-full', ['--debug-prerender'], { __NEXT_SHOW_IGNORE_LISTED: 'true' }],
+      ]) {
+        const { code, output } = await build(fixture + '-' + mode, flags, vars)
+        assert.notEqual(code, 0)
+        const headline = output.split('\n').find(line => line.includes('Route "/probe"') && line.includes(api))
+        assert(headline, 'Missing ' + api + ' diagnostic for ' + fixture)
+        const frames = output.split('\n').filter(line => /^\s+at /.test(line))
+        const hasHelper = frames.some(line => line.includes(helper) && line.includes('node_modules/clock-reader/index.js'))
+        assert.equal(hasHelper, mode === 'debug-full', 'Unexpected dependency frame for ' + fixture + ' in ' + mode)
+        if (mode === 'debug-full') {
+          assert(frames.some(line => /\bPage\b.*app\/probe\/page\.jsx/.test(line)), 'Missing application caller')
+        }
       }
+      console.log('PASS dependency trace:', api, helper, 'and Page')
     }
-  } finally { await fs.rm('app/probe',{recursive:true}) }
+  } finally { await fs.rm('app/probe', { recursive: true }) }
 }
 const origin='http://127.0.0.1:3137'
 async function until(fn, message, timeout=25000) {

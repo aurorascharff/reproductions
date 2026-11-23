@@ -5,3 +5,9 @@ exports.readClock = function readClock() {
 exports.ClockWidget = function ClockWidget() {
   return require('react').createElement('time', null, exports.readClock())
 }
+exports.readRandom = function readRandom() {
+  return Math.random()
+}
+exports.readUUID = function readUUID() {
+  return crypto.randomUUID()
+}

@@ -63,6 +63,8 @@ Next.js 16.4.6 and 16.5.0-canary.59, Playwright 1.65.1, Chromium headless shell.
 | Playwright, no route, `setExtraHTTPHeaders({ 'cache-control': 'no-cache' })` | `no-cache` | yes | **none** |
 | Playwright, `page.route` then `unrouteAll` before the visit | none | no | terminal, console |
 | Playwright, `page.route` that rewrites the header to `max-age=0` | `max-age=0` | no | terminal, console |
+| Playwright, `instant()` around `goto` (the only load) | none | no | **none**; the load fails with a generic error |
+| Playwright, `instant()` around `goto`, with `page.route` on a URL that never matches | `no-cache` | no | **none**; the same generic error |
 
 `pnpm build` fails on the same page with `blocking-prerender-dynamic`, so the
 mistake is only found at build.
@@ -108,3 +110,19 @@ One of:
   `Cache-Control: no-cache` request header from an automated browser, or
 - the bypass warning says that blocking-route validation was skipped for this
   request and which header caused it, and the Playwright guide mentions it.
+
+## `instant()` on a blocking route
+
+`instant()` from `@next/playwright` does not intercept requests, so it does not turn validation off.
+But when the only load of a blocking route happens inside `instant()`, the specific error is not
+reported either. The request answers 500, and the terminal and the browser show:
+
+```text
+The Navigation Inspector was active, but you attempted to load a blocking route.
+Reload the page to reset the inspector.
+To identify why this route is blocking, refer to the Instant Navigation docs
+```
+
+It says the route is blocking, not which read blocks it or where. Loading the route once without
+`instant()` and without a route handler prints the full `blocking-prerender-dynamic` error with
+its source line. Checked on Next.js 16.4.6 with `@next/playwright` 16.4.6.

@@ -15,6 +15,7 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@next/playwright": "16.4.6",
     "@types/node": "^24",
     "@types/react": "^19",
     "playwright": "1.65.1",

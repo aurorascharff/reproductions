@@ -2,6 +2,7 @@
 import { spawn, execFileSync } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { instant } from '@next/playwright';
 
 const PORT = 3492;
 const URL = `http://localhost:${PORT}/`;
@@ -52,5 +53,12 @@ await scenario('curl only', async () => void execFileSync('curl', ['-s', '-o', '
 await scenario('Playwright, plain goto, page left open', page => page.goto(URL, { waitUntil: 'networkidle' }));
 await scenario('Playwright with a route() registered, page left open', async page => {
   await page.route('**/never-matches/**', r => r.continue());
+  await page.goto(URL, { waitUntil: 'networkidle' });
+});
+await scenario('Playwright, instant() around goto (the only load), page left open', page =>
+  instant(page, async () => { await page.goto(URL); await page.waitForTimeout(1500); }, { baseURL: URL }).catch(() => {}),
+);
+await scenario('Playwright, instant() around goto, then a plain goto, page left open', async page => {
+  await instant(page, async () => { await page.goto(URL); await page.waitForTimeout(1500); }, { baseURL: URL }).catch(() => {});
   await page.goto(URL, { waitUntil: 'networkidle' });
 });

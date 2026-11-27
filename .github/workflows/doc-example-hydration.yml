@@ -1,0 +1,63 @@
+name: Documentation example hydration
+on:
+  push:
+    branches: ['codex/doc-examples-102245-*']
+permissions:
+  contents: read
+jobs:
+  hydrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      LANG: ja_JP.UTF-8
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/checkout@v4
+        with:
+          repository: vercel/next.js
+          ref: fb4e795d107e7b72f77bc1b44480db82ea60a522
+          path: doc-source
+          sparse-checkout: |
+            docs/01-app/02-guides
+            docs/01-app/03-api-reference/04-functions
+            errors
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: vercel/next.js
+          ref: b41a4d7e1fe61c4d54a0be81a73cf16696061f85
+          path: flash-source
+          sparse-checkout: docs/01-app/02-guides
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Generate fixtures from the PRs
+        run: |
+          python3 cases/documentation-hydration/generate.py doc-source flash-source fixture
+          cp cases/documentation-hydration/check.mjs fixture/
+      - name: Install
+        working-directory: fixture
+        run: |
+          npm init -y
+          npm install --no-audit --no-fund next@16.5.0-canary.50 react@19.2.5 react-dom@19.2.5 playwright@1.56.1 typescript@5.9.3 @types/react@19 @types/node@22
+          npx playwright install --with-deps chromium
+      - name: Build and hydrate
+        working-directory: fixture
+        run: |
+          npx next build
+          npx next start -p 3127 > server.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for i in {1..50}; do if curl -fsS http://127.0.0.1:3127/ > /dev/null; then break; fi; sleep 1; done
+          node check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hydration-results
+          path: |
+            fixture/results.json
+            fixture/inventory.json
+            fixture/server.log

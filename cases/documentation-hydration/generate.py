@@ -21,7 +21,7 @@ export default function Page() {{return <main><h1>{name}</h1><Suspense fallback=
 write(app/'ready.jsx',"""'use client'
 import {useEffect,useState} from 'react'
 export function Ready(){const [ready,set]=useState(false);useEffect(()=>set(true),[]);return <i id="ready" data-ready={ready}/>}""")
-write(app/'layout.jsx',"export default function Layout({children}) {return <html lang='en'><body>{children}</body></html>}")
+write(app/'layout.jsx',"export default function Layout({children}) {return <html lang='en'><head><link rel='icon' href='data:,'/></head><body>{children}</body></html>}")
 write(app/'page.jsx',"export default function Page(){return <p>Documentation fixtures</p>}")
 write(dest/'next.config.mjs',"export default {cacheComponents:true,typescript:{ignoreBuildErrors:true},experimental:{cpus:2}}")
 support="""
@@ -102,8 +102,8 @@ for i,(lang,code) in enumerate(blocks(ref),1):
 flashfile=flash/'docs/01-app/02-guides/preventing-flash-before-hydration.mdx'
 fb=list(blocks(flashfile))
 for lang in ('tsx','jsx'):
- client=next(c for l,c in fb if l==lang and 'export function LocalDate(' in c)
- parent=next(c for l,c in fb if l==lang and 'import { LocalDate }' in c)
+ client=next(c for l,c in fb if l==lang and 'function BrowserDate(' in c and 'use(browser())' in c)
+ parent=next(c for l,c in fb if l==lang and "from '@/app/components/browser-date'" in c)
  name='flash-date-'+lang
  route(name,flashfile.name,parent.replace('@/app/components/browser-date','./browser-date'),lang,kind='date')
  write(app/name/('browser-date.'+lang),client)

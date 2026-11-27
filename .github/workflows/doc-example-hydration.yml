@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: vercel/next.js
-          ref: b41a4d7e1fe61c4d54a0be81a73cf16696061f85
+          ref: 61ae49ba0005e3b5185b2c3df86758a850848dc5
           path: flash-source
           sparse-checkout: docs/01-app/02-guides
           persist-credentials: false

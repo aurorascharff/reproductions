@@ -2,7 +2,7 @@
 from pathlib import Path
 import re, sys, json, textwrap
 docs, flash, dest = map(Path, sys.argv[1:4]); app=dest/'app'; app.mkdir(parents=True, exist_ok=True)
-routes=[]; skipped=[]
+routes=[]; skipped=[]; only_cards='--browser-cards' in sys.argv[4:]
 def write(p,s):
  p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s)
 def blocks(path):
@@ -49,6 +49,13 @@ for source in sorted((docs/'errors').glob('blocking-prerender-*.mdx')):
  snippets=list(blocks(source));parts={n:c for n,(_,c) in enumerate(snippets,1)}
  for i,(lang,code) in enumerate(snippets,1):
   name=f'{slug}-{i}';label=f'{source.name}:{i}'
+  if only_cards:
+   if "'use client'" not in code or '  use(browser())' not in code:continue
+   sym=re.search(r'export function (\w+)\(',code)[1]
+   r='card-'+slug
+   route(r,label,"'use client'\nimport {useState} from 'react'\nimport {"+sym+" as Subject} from './subject'\nexport default function Frame(){const [n,set]=useState(0);return <><button id='again' onClick={()=>set(n+1)}>{n}</button><div id='card'><Subject tick={n}/></div></>}",kind='browser-card')
+   write(app/r/'subject.jsx',code)
+   continue
   if i in (2,3) and not slug.endswith('client'):
    continue # paired with its shell below
   if i==1 and not slug.endswith('client'):
@@ -82,6 +89,10 @@ for source in sorted((docs/'errors').glob('blocking-prerender-*.mdx')):
     extra+=f"\nexport default async function Subject(){{return <output>{{String(await {sym}()).length}}</output>}}"
   if 'function Layout(' in code:prop='children={<p>Content</p>}'
   route(name,label,code,prop=prop,extra=extra)
+if only_cards:
+ assert len(routes)==3, routes
+ write(dest/'inventory.json',json.dumps({'routes':routes,'nonRendering':[]},indent=2))
+ sys.exit(0)
 guide=next((docs/'docs/01-app/02-guides').glob('migrating-to-cache-components.mdx'))
 for i,(lang,code) in enumerate(blocks(guide),1):
  label=f'{guide.name}:{i}'

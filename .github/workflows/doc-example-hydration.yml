@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: vercel/next.js
-          ref: fb4e795d107e7b72f77bc1b44480db82ea60a522
+          ref: 86c6910112f656f797756b896553b9cae06568f4
           path: doc-source
           sparse-checkout: |
             docs/01-app/02-guides
@@ -36,7 +36,7 @@ jobs:
         with: {node-version: 22}
       - name: Generate fixtures from the PRs
         run: |
-          python3 cases/documentation-hydration/generate.py doc-source flash-source fixture
+          python3 cases/documentation-hydration/generate.py doc-source flash-source fixture --browser-cards
           cp cases/documentation-hydration/check.mjs fixture/
       - name: Install
         working-directory: fixture

@@ -18,7 +18,18 @@ try {
    const res=await page.goto(url+name,{waitUntil:'networkidle'})
    assert.equal(res.status(),200);const html=await res.text()
    await page.locator('#ready[data-ready=true]').waitFor({state:'attached'})
-   if(kind==='date'){
+   if(kind==='browser-card'){
+    const fallback={'card-crypto':'…','card-current-time':'Loading time…','card-random':'Loading label…'}[name]
+    const nojs=await browser.newContext({javaScriptEnabled:false})
+    try{const initial=await nojs.newPage();await initial.goto(url+name);assert.ok((await initial.locator('#card').textContent()).includes(fallback))}finally{await nojs.close()}
+    const value=page.locator('#card')
+    await page.waitForFunction(f=>{const s=document.querySelector('#card')?.textContent;return s && !s.includes(f)},fallback)
+    const before=await value.textContent()
+    if(name==='card-crypto')assert.match(before,/Draft ID: [0-9a-f-]{36}/)
+    if(name==='card-random')assert.match(before,/Random label: [0-9a-z]+/)
+    if(name==='card-current-time')assert.equal(before,await page.evaluate(()=>new Date().toLocaleTimeString()))
+    await page.locator('#again').click();assert.equal(await value.textContent(),before)
+   } else if(kind==='date'){
     assert.match(html,/2026\/6\/15/);assert.equal(await page.locator('time').textContent(),'6/15/2026')
    } else if(kind==='network'){
     const status=page.locator('#example p');assert.equal(await status.textContent(),'Online')
